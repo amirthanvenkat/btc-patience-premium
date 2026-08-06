@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bitcoin, Patiently</title>
+<meta name="description" content="What fourteen years of Bitcoin prices actually show about buying, waiting and selling. Written for people who are new to this. Educational, not advice.">
+<style>
+  :root{
+    --bg:#0b0d11; --card:#13171d; --card2:#191e26; --line:#252c36;
+    --tx:#e8edf3; --dim:#8b97a6; --accent:#f7931a;
+    --up:#31c48d; --down:#f26d6d; --buy:#31c48d; --sell:#f7931a;
+    --r:14px; --sp:clamp(16px,3vw,26px);
+  }
+  @media (prefers-color-scheme:light){
+    :root{ --bg:#fbfbfc; --card:#fff; --card2:#f5f7f9; --line:#e3e7ec;
+           --tx:#151a21; --dim:#5f6b7a; --up:#0f9d63; --down:#d64545; --buy:#0f9d63; }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--tx);
+    font:16px/1.65 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:clamp(20px,4vw,44px) var(--sp) 90px}
+
+  header{margin-bottom:28px}
+  .eyebrow{color:var(--accent);font-size:.76rem;font-weight:650;letter-spacing:.09em;text-transform:uppercase}
+  h1{font-size:clamp(1.7rem,4.6vw,2.5rem);line-height:1.12;letter-spacing:-.028em;margin:.35rem 0 .6rem;font-weight:700}
+  .lede{color:var(--dim);font-size:1.05rem;max-width:64ch;margin:0}
+
+  section{margin-top:clamp(36px,6vw,58px)}
+  h2{font-size:1.28rem;letter-spacing:-.018em;margin:0 0 8px;font-weight:650}
+  h3{font-size:.82rem;margin:0 0 10px;font-weight:650;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+  .sectionsub{color:var(--dim);font-size:.96rem;margin:0 0 16px;max-width:66ch}
+  .lead-in{font-size:1rem;margin:0 0 14px;max-width:66ch}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:var(--sp)}
+  .card + .card{margin-top:14px}
+
+  .headline{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .hstat{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);
+    border-radius:12px;padding:18px}
+  .hstat .n{font-size:clamp(1.7rem,4.4vw,2.2rem);font-weight:700;letter-spacing:-.03em;
+    color:var(--accent);line-height:1.05;font-variant-numeric:tabular-nums}
+  .hstat .t{font-weight:600;margin-top:7px;font-size:.96rem}
+  .hstat .s{color:var(--dim);font-size:.85rem;margin-top:4px;line-height:1.5}
+
+  .hero{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+  .big{font-size:clamp(2.1rem,6vw,3rem);font-weight:700;letter-spacing:-.03em;line-height:1}
+  .week{color:var(--dim);font-size:.9rem;padding-bottom:4px}
+
+  .legs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:620px){ .legs{grid-template-columns:1fr;gap:22px} }
+  .stats{display:grid;gap:10px}
+  .stat{background:var(--card2);border:1px solid transparent;border-radius:11px;padding:12px 14px;
+        display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:2px 10px}
+  .stat.on{border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
+  .stat .k{color:var(--dim);font-size:.8rem;font-weight:600}
+  .stat .v{font-size:1.3rem;font-weight:650;letter-spacing:-.02em;text-align:right;font-variant-numeric:tabular-nums}
+  .stat .d{grid-column:1/-1;color:var(--dim);font-size:.79rem}
+
+  .verdict{margin-top:18px;padding:13px 16px;border-radius:11px;font-size:.95rem;
+    background:var(--card2);border-left:3px solid var(--dim)}
+  .verdict.v-buy{border-left-color:var(--buy)}
+  .verdict.v-sell{border-left-color:var(--sell)}
+
+  .pickerbar{margin-bottom:14px}
+  .picker{display:flex;gap:8px;flex-wrap:wrap}
+  .picker button{background:var(--card);color:var(--tx);border:1px solid var(--line);
+    border-radius:999px;padding:7px 16px;font-size:.88rem;cursor:pointer;font-weight:550}
+  .picker button:hover{border-color:var(--accent)}
+  .picker button.on{background:var(--accent);border-color:var(--accent);color:#0b0d11;font-weight:650}
+  #presetblurb{margin:9px 2px 0;max-width:64ch}
+
+  .chartwrap{overflow-x:auto}
+  .chart{width:100%;height:auto;min-width:520px;display:block}
+  .chart .grid{stroke:var(--line);stroke-width:1}
+  .chart .ylab,.chart .xlab{fill:var(--dim);font-size:10.5px}
+  .chart .ylab{text-anchor:end} .chart .xlab{text-anchor:middle}
+  .chart .band{fill:color-mix(in srgb,var(--buy) 34%,transparent)}
+  .chart .band-open{fill:color-mix(in srgb,var(--buy) 50%,transparent)}
+  .chart .price{fill:none;stroke:var(--tx);stroke-width:1.6;stroke-linejoin:round}
+  .chart .wma{fill:none;stroke:var(--accent);stroke-width:1.2;opacity:.55}
+  .chart .sellline{stroke:var(--sell);stroke-width:1;stroke-dasharray:3 3;opacity:.6}
+  .chart .sell{fill:var(--sell)}
+  .chart .now{fill:var(--tx)}
+  .key{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;color:var(--dim);font-size:.82rem}
+  .key span{display:flex;align-items:center;gap:6px}
+  .sw{width:13px;height:3px;border-radius:2px;display:inline-block}
+  .sw-band{background:color-mix(in srgb,var(--buy) 55%,transparent);height:11px;width:11px;border-radius:3px}
+  .sw-price{background:var(--tx)} .sw-wma{background:var(--accent);opacity:.6}
+  .sw-sell{background:var(--sell);height:9px;width:9px;border-radius:50%}
+
+  table{width:100%;border-collapse:collapse;font-size:.91rem}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{color:var(--dim);font-size:.76rem;letter-spacing:.05em;text-transform:uppercase;font-weight:650;white-space:nowrap}
+  tbody tr:last-child td{border-bottom:0}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  td.num .sm{text-align:right}
+  tr.hl td{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+  tr.open td{background:var(--card2)}
+  .sm{font-size:.8rem;display:block;color:var(--dim);margin-top:3px;font-weight:400}
+  .dim{color:var(--dim)} .up{color:var(--up)} .down{color:var(--down)} .bad{color:var(--down)}
+  .tag{background:color-mix(in srgb,var(--accent) 20%,transparent);color:var(--accent);
+    font-size:.68rem;padding:2px 7px;border-radius:99px;font-weight:650;white-space:nowrap}
+  .tblwrap{overflow-x:auto}
+  .note{background:var(--card2);border-radius:11px;padding:14px 16px;margin-top:14px;font-size:.93rem}
+
+  .bars{display:grid;gap:10px;margin-top:6px}
+  .bar{display:grid;grid-template-columns:112px minmax(0,1fr) 52px;align-items:center;gap:12px;font-size:.92rem}
+  .bar .track{display:block;background:var(--card2);border-radius:99px;height:24px;overflow:hidden}
+  .bar .fill{display:block;height:100%;
+    background:linear-gradient(90deg,color-mix(in srgb,var(--up) 55%,transparent),var(--up));
+    border-radius:99px}
+  .bar .pctv{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}
+  @media (max-width:480px){ .bar{grid-template-columns:92px minmax(0,1fr) 46px;gap:9px;font-size:.86rem} }
+
+  .rulegrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:620px){ .rulegrid{grid-template-columns:1fr} }
+  .rule{background:var(--card2);border-radius:11px;padding:16px}
+  .rule h4{margin:0 0 8px;font-size:.98rem}
+  .cond{display:flex;align-items:center;gap:8px;font-size:.9rem;padding:5px 0}
+  .cond code{background:var(--card);padding:2px 8px;border-radius:6px;font-size:.85rem;white-space:nowrap}
+  .amp{color:var(--dim);font-size:.78rem;padding-left:2px}
+
+  dl.gloss{margin:0;display:grid;grid-template-columns:minmax(130px,190px) 1fr}
+  dl.gloss dt{font-weight:650;padding:11px 0;border-top:1px solid var(--line)}
+  dl.gloss dd{margin:0;padding:11px 0 11px 18px;border-top:1px solid var(--line);color:var(--dim)}
+  dl.gloss dt:first-of-type,dl.gloss dd:first-of-type{border-top:0}
+  @media (max-width:560px){
+    dl.gloss{grid-template-columns:1fr}
+    dl.gloss dd{padding:0 0 12px;border-top:0}
+    dl.gloss dt{padding:12px 0 3px}
+  }
+
+  footer{margin-top:58px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:.85rem}
+  footer p{margin:.7rem 0}
+  .vtag{display:inline-block;background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent);
+    font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    padding:2px 9px;border-radius:99px;margin-right:8px;vertical-align:1px}
+  a{color:var(--accent)}
+  code{background:var(--card2);padding:1px 6px;border-radius:5px;font-size:.86em}
+  #loading{color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Fourteen years of evidence</div>
+  <h1>Bitcoin has rewarded patience. Here is what the record shows.</h1>
+  <p class="lede">This page works through what actually happened to people who bought Bitcoin and waited,
+     using every weekly price since 2011. It is written for someone who has never invested before, so nothing
+     assumes prior knowledge, and every number is calculated in your own browser from public data so you can
+     check it.</p>
+</header>
+
+<div id="loading" class="card"><span id="loadmsg">Loading price history</span></div>
+
+<main id="main" hidden>
+
+  <section>
+    <h2>Three things the record shows</h2>
+    <p class="lead-in">Start here. These are the findings that held up best across the whole history.</p>
+    <div class="headline" id="headline"></div>
+  </section>
+
+  <section>
+    <h2>Time in the market did the heavy lifting</h2>
+    <p class="lead-in">For every week in this history, how often was Bitcoin worth more a year later?
+       Two years? Three? The longer people held, the more consistently they were ahead.</p>
+    <div class="card">
+      <div class="bars" id="odds"></div>
+      <div class="note" id="oddsnote"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The simplest approach did best of all</h2>
+    <p class="lead-in">I tested a lot of clever rules on this data. The one that made the most money needed
+       no charts, no timing and no skill: buy the same amount every month and never sell.</p>
+    <div class="card"><div class="tblwrap" id="simple"></div></div>
+  </section>
+
+  <section>
+    <h2>Where Bitcoin is today</h2>
+    <p class="sectionsub">The signals below are one way of spotting unusually cheap and unusually stretched
+       moments. They are a lens on the market, not instructions.</p>
+    <div class="card">
+      <div class="hero">
+        <div class="big" id="price"></div>
+        <div class="week" id="week"></div>
+      </div>
+      <div class="legs">
+        <div><h3>Buy conditions</h3><div class="stats" id="buylegs"></div></div>
+        <div><h3>Sell conditions</h3><div class="stats" id="selllegs"></div></div>
+      </div>
+      <div class="verdict" id="verdict"></div>
+      <p class="sm dim" style="margin:14px 0 0">Price data from <span id="source"></span>, calculated in this browser.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>How the signals work</h2>
+    <p class="lead-in">Two measurements of momentum. <strong>RSI</strong> scores how hard the price has been
+       pushed lately on a scale of 0 to 100, where low means beaten down and high means running hot.
+       <strong>Williams %R</strong> asks where this week's price sits inside its recent range, from 0 at the
+       very top to −100 at the very bottom. When both agree that things are extreme, that has tended to be
+       a moment worth noticing.</p>
+    <div class="card">
+      <div class="rulegrid">
+        <div class="rule">
+          <h4>A buying signal</h4>
+          <div class="cond"><code>RSI below 30</code></div>
+          <div class="amp">and</div>
+          <div class="cond"><code>Williams %R below −80</code></div>
+          <p class="sm" style="margin:10px 0 0">Both deeply oversold, meaning the price has fallen hard and
+             is sitting near the bottom of its recent range. Historically uncommon and worth paying attention to.</p>
+        </div>
+        <div class="rule">
+          <h4>A selling signal</h4>
+          <div class="cond"><code>RSI above 90</code></div>
+          <div class="amp">and</div>
+          <div class="cond"><code>Williams %R above −10</code></div>
+          <p class="sm" style="margin:10px 0 0">Both stretched to an extreme at once, which has only happened
+             near major peaks. The exact levels differ by preset.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Fourteen years, one rule</h2>
+    <p class="sectionsub">Shaded bands are weeks the buy conditions were met. Dashed lines are sell signals.
+       Note how the bands cluster in the quiet stretches after big falls.</p>
+    <div class="card">
+      <div class="chartwrap" id="chart"></div>
+      <div class="key" id="chartkey"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Every buying signal so far</h2>
+    <p class="lead-in" id="epilead"></p>
+    <div class="card"><div class="tblwrap" id="windows"></div></div>
+  </section>
+
+  <section>
+    <h2>Four ways of using the signals</h2>
+    <p class="sectionsub">Switching between these changes every table below. They differ in how patient they
+       are, not in what they measure.</p>
+    <div class="pickerbar">
+      <div id="presets" class="picker"></div>
+      <p class="sm dim" id="presetblurb"></p>
+    </div>
+    <div class="card">
+      <div class="tblwrap" id="results"></div>
+      <div class="note" id="resultnote"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Every completed trade</h2>
+    <p class="sectionsub">What this preset actually did, start to finish.</p>
+    <div class="card"><div class="tblwrap" id="trades"></div></div>
+  </section>
+
+  <section>
+    <h2>How much the sell level matters</h2>
+    <p class="sectionsub">The same rule run at different RSI levels for selling.</p>
+    <div class="card"><div class="tblwrap" id="sweep"></div></div>
+  </section>
+
+  <section>
+    <h2>More signals, or bigger ones?</h2>
+    <p class="sectionsub">The four presets side by side.</p>
+    <div class="card"><div class="tblwrap" id="presettable"></div></div>
+  </section>
+
+  <section>
+    <h2>Do the two indicators peak together?</h2>
+    <p class="sectionsub">No, and the gap between them is bigger than you might expect.</p>
+    <div class="card">
+      <div class="tblwrap" id="leadlag"></div>
+      <div class="note" id="leadlagnote"></div>
+    </div>
+  </section>
+
+</main>
+
+<section>
+  <h2>Words you will meet here</h2>
+  <p class="sectionsub">Nothing below assumes you already know any of this.</p>
+  <div class="card">
+    <dl class="gloss">
+      <dt>Bitcoin</dt>
+      <dd>A digital currency you can buy and hold like a share. Nobody runs it. Its price moves far more than shares do, both up and down.</dd>
+      <dt>Weekly chart</dt>
+      <dd>Each bar covers a whole week instead of a day. It filters out short term noise, so signals are slower and there are fewer of them.</dd>
+      <dt>Dollar cost averaging</dt>
+      <dd>Buying a set amount on a regular schedule, say the first of every month, regardless of the price. It removes the need to guess the right moment, which almost nobody manages reliably.</dd>
+      <dt>RSI</dt>
+      <dd>Relative Strength Index. A 0 to 100 score for how hard the price has been pushed recently. Below 30 is usually called oversold, above 70 overbought. Above 90 on a weekly chart is rare.</dd>
+      <dt>Williams %R</dt>
+      <dd>A second momentum measure, running from 0 down to −100. Near 0 means the price is closing at the top of its recent range, near −100 means the bottom.</dd>
+      <dt>Oversold</dt>
+      <dd>A reading saying the price has fallen hard and fast. Historically these have often been good moments to buy, though it never guarantees the fall has finished.</dd>
+      <dt>Confluence</dt>
+      <dd>Two different measurements agreeing at the same time. Agreement filters out signals that either one alone would give too often.</dd>
+      <dt>Multiple</dt>
+      <dd>What you ended with divided by what you paid in. Pay in $10,000, end with $15,000, that is 1.5x.</dd>
+      <dt>Worst dip</dt>
+      <dd>The biggest fall from a high point to a later low along the way. Everything on this page went through large ones, so it is worth knowing before you start rather than discovering later.</dd>
+      <dt>Backtest</dt>
+      <dd>Running a rule against past prices to see what it would have done. It shows what already happened, which is useful, but it is a record rather than a forecast.</dd>
+      <dt>Hindsight</dt>
+      <dd>Knowing something only after the fact. Peaks are obvious on an old chart and much harder to call while they are forming, which is why this page always shows when a signal could actually have been acted on.</dd>
+    </dl>
+  </div>
+</section>
+
+<section>
+  <h2>Keeping it in proportion</h2>
+  <div class="card">
+    <p style="margin-top:0">Everything above is drawn from a single fourteen year run of one asset that grew
+       enormously over that period. That is a real record and a genuinely encouraging one, and it is also a
+       small sample by the standards of any other market.</p>
+    <p>The falls were severe. Every approach here, including the best one, spent time down more than 50% from
+       its high. Anyone who sold during those stretches locked in the loss, which is why the honest advice is
+       to size a position so that sitting through one is bearable.</p>
+    <p style="margin-bottom:0">Trading costs and tax are excluded from these figures. Nothing here predicts
+       the future, and nobody, including anyone confidently telling you otherwise, knows what the price does next.</p>
+  </div>
+</section>
+
+<footer>
+  <p><span class="vtag">Version 1</span> This is the first public release. More is planned: longer history
+     from additional exchanges, a way to change the settings yourself rather than picking from presets, and
+     results measured from different starting years. If something here looks wrong or unclear, that feedback
+     is genuinely useful and shapes what comes next.</p>
+  <p><strong>Educational material, not financial advice.</strong> Nothing here is a recommendation to buy,
+     sell or hold anything, and the author is not a licensed financial adviser. Only you can judge what fits
+     your circumstances, and it is worth speaking to someone qualified before committing money.</p>
+  <p>Prices come from public exchange data and every calculation runs on your own device. Nothing is tracked
+     or collected. The full working is in <code>engine.js</code>, so any figure here can be checked.</p>
+</footer>
+
+</div>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

@@ -1,8 +1,13 @@
 # Bitcoin, Patiently
 
+**Live: [amirthanvenkat.github.io/bitcoin-patiently](https://amirthanvenkat.github.io/bitcoin-patiently/)**
+
 A single page walking a complete beginner through what fourteen years of weekly Bitcoin prices actually show
 about buying, waiting and selling. No build step, no dependencies, no backend. Every figure is calculated in
 the browser from public price data, so anything shown can be checked against the code.
+
+> **Version 1.** First public release. Planned next: longer history from additional exchanges, user-editable
+> settings rather than fixed presets, and results measured from different starting years.
 
 > Educational material, not financial advice. No recommendation to buy, sell or hold is made or implied,
 > and the author is not a licensed financial adviser.

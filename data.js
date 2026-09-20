@@ -57,7 +57,34 @@ async function coinbase(onProgress) {
   return { source: 'Coinbase BTC-USD daily', bars: out };
 }
 
+// Cached for the rest of the UTC day. The series only gains one bar a day, so a
+// repeat visit has nothing to gain from refetching and a lot to gain from not
+// making six sequential requests before anything renders.
+const CACHE_KEY = 'btc-daily-v1';
+
+function readCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const c = JSON.parse(raw);
+    if (c.day !== new Date().toISOString().slice(0, 10)) return null;
+    if (!Array.isArray(c.bars) || c.bars.length < 800) return null;
+    return c;
+  } catch { return null; }
+}
+
+function writeCache(bars, source) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      day: new Date().toISOString().slice(0, 10), bars, source,
+    }));
+  } catch { /* private mode, quota, or storage disabled: not worth failing over */ }
+}
+
 export async function loadDaily(onProgress) {
+  const cached = readCache();
+  if (cached) return { bars: cached.bars, source: cached.source + ' (cached today)' };
+
   let got, errs = [];
   for (const fn of [bitstamp, binance, coinbase]) {
     try {
@@ -75,5 +102,6 @@ export async function loadDaily(onProgress) {
     .sort((a, b) => a.t - b.t)
     .map(b => ({ ...b, date: new Date(b.t).toISOString().slice(0, 10) }));
 
+  writeCache(bars, got.source);
   return { bars, source: got.source };
 }

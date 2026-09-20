@@ -3,8 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bitcoin, Patiently</title>
+<title>The Patience Premium</title>
 <meta name="description" content="What fourteen years of Bitcoin prices actually show about buying, waiting and selling. Written for people who are new to this. Educational, not advice.">
+<link rel="canonical" href="https://amirthanvenkat.github.io/btc-patience-premium/">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#0b0d11">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Patience Premium">
+<meta property="og:title" content="Bitcoin: what fourteen years actually show">
+<meta property="og:description" content="Across every week since 2012, the price was higher three years later 99% of the time. A plain-English walkthrough for people new to this, computed live in your browser.">
+<meta property="og:url" content="https://amirthanvenkat.github.io/btc-patience-premium/">
+<meta property="og:image" content="https://amirthanvenkat.github.io/btc-patience-premium/social-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bitcoin: what fourteen years actually show. 99 percent of weeks were followed by a higher price three years later.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bitcoin: what fourteen years actually show">
+<meta name="twitter:description" content="Across every week since 2012, the price was higher three years later 99% of the time. Computed live in your browser.">
+<meta name="twitter:image" content="https://amirthanvenkat.github.io/btc-patience-premium/social-card.png">
 <style>
   :root{
     --bg:#0b0d11; --card:#13171d; --card2:#191e26; --line:#252c36;
@@ -72,6 +89,14 @@
   .picker button.on{background:var(--accent);border-color:var(--accent);color:#0b0d11;font-weight:650}
   #presetblurb{margin:9px 2px 0;max-width:64ch}
 
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;
+      transition-duration:.01ms !important}
+  }
+  .chart.eq .equity{fill:none;stroke:var(--up);stroke-width:2;stroke-linejoin:round}
+  .chart.eq .paid{fill:none;stroke:var(--dim);stroke-width:1.4;stroke-dasharray:4 3}
+  .sw-eq{background:var(--up)} .sw-paid{background:var(--dim)}
   .chartwrap{overflow-x:auto}
   .chart{width:100%;height:auto;min-width:520px;display:block}
   .chart .grid{stroke:var(--line);stroke-width:1}
@@ -147,7 +172,7 @@
 <div class="wrap">
 
 <header>
-  <div class="eyebrow">Fourteen years of evidence</div>
+  <div class="eyebrow">The patience premium</div>
   <h1>Bitcoin has rewarded patience. Here is what the record shows.</h1>
   <p class="lede">This page works through what actually happened to people who bought Bitcoin and waited,
      using every weekly price since 2011. It is written for someone who has never invested before, so nothing
@@ -256,6 +281,17 @@
     <div class="card">
       <div class="tblwrap" id="results"></div>
       <div class="note" id="resultnote"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What the money actually did</h2>
+    <p class="sectionsub">The same run as the table above, drawn over time. The dashed line is the total
+       paid in, the solid line is what it was worth.</p>
+    <div class="card">
+      <div class="chartwrap" id="equity"></div>
+      <div class="key" id="equitykey"></div>
+      <div class="note" id="equitynote"></div>
     </div>
   </section>
 

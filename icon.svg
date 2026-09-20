@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Rising line on a dark square">
+  <rect width="64" height="64" rx="14" fill="#0b0d11"/>
+  <path d="M8 46 L22 40 L32 43 L44 24 L56 14" fill="none" stroke="#31c48d"
+        stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="56" cy="14" r="5" fill="#f7931a"/>
+</svg>

@@ -1,6 +1,6 @@
 import { loadDaily } from './data.js';
 import { computeWeekly, runAll, buyEpisodes, buyHold, thresholdSweep, leadLag, PRESETS } from './engine.js';
-import { priceChart } from './chart.js';
+import { priceChart, equityChart } from './chart.js';
 
 const $ = id => document.getElementById(id);
 const usd = n => '$' + Math.round(n).toLocaleString('en-US');
@@ -131,6 +131,18 @@ function renderResults(S) {
     <p class="sm dim">Weekly data, ${S.W[0].date} to ${S.W[i].date}, paying in ${usd(S.cfg.monthly)} a month.
        A ${usd(10000)} lump sum left untouched would have become ${usd(lump.final)}.
        Costs and tax excluded.</p>`;
+  const eq = $('equity');
+  if (eq) {
+    eq.innerHTML = equityChart(S.W, hero.curve, hero.paidCurve);
+    $('equitykey').innerHTML = `
+      <span><i class="sw sw-eq"></i>What the money was worth</span>
+      <span><i class="sw sw-paid"></i>Total paid in</span>`;
+    $('equitynote').innerHTML = `Both lines on a logarithmic scale, so equal vertical distances mean equal
+      percentage moves. The flat stretch early on is the part that tests people: the money went nowhere much
+      for years before the shape changed. Ending value ${usd(hero.final)} against ${usd(hero.contributed)}
+      paid in.`;
+  }
+
   $('resultnote').innerHTML = `
     This preset ended with <strong>${usd(hero.final)}</strong> from ${hero.trades.length}
     ${hero.trades.length === 1 ? 'sell' : 'sells'}, with a worst dip of ${hero.maxDD.toFixed(0)}%.
@@ -262,17 +274,21 @@ function renderOdds() {
   const S = computeWeekly(DAILY, PRESETS[0].cfg);
   const rows = [1, 2, 3, 4].map(y => holdingOdds(S, y)).filter(r => r.n > 50);
   $('odds').innerHTML = rows.map(r => `
-    <div class="bar">
-      <span>${r.years} year${r.years > 1 ? 's' : ''} later</span>
-      <span class="track"><span class="fill" style="width:${r.pct.toFixed(1)}%"></span></span>
-      <span class="pctv">${r.pct.toFixed(0)}%</span>
+    <div class="bar" role="img"
+         aria-label="Held for ${r.years} year${r.years > 1 ? 's' : ''}: the price was higher afterwards in ${r.pct.toFixed(0)} percent of cases, from ${r.n.toLocaleString()} weeks.">
+      <span aria-hidden="true">${r.years} year${r.years > 1 ? 's' : ''} later</span>
+      <span class="track" aria-hidden="true"><span class="fill" style="width:${r.pct.toFixed(1)}%"></span></span>
+      <span class="pctv" aria-hidden="true">${r.pct.toFixed(0)}%</span>
     </div>`).join('');
   const one = rows[0], three = rows.find(r => r.years === 3);
   $('oddsnote').innerHTML = `
-    Holding for a single year still meant losing money in about ${(100 - one.pct).toFixed(0)}% of cases, so
-    short horizons were genuinely uncertain. Stretch it to three years and that fell to roughly
-    ${(100 - three.pct).toFixed(0)}%. This is one asset over one fourteen year run rather than a law of
-    nature, but the direction is consistent and it is the clearest pattern on this page.`;
+    <strong>Read the four year figure carefully.</strong> It is drawn from a single asset over a single
+    fourteen year run in which the price rose from a few dollars to tens of thousands. Any asset with that
+    shape produces a number close to 100% at long horizons, so this describes what happened rather than
+    what must happen, and it is not a promise about any four years to come.
+    The nearer horizons are the more informative ones: holding for a single year still meant losing money in
+    about ${(100 - one.pct).toFixed(0)}% of cases, falling to roughly ${(100 - three.pct).toFixed(0)}% at
+    three years. The direction is consistent, and it is the clearest pattern on this page.`;
 }
 
 function renderSimple() {

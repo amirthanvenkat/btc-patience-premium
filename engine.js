@@ -223,7 +223,7 @@ function stats(name, note, W, C, curve, contributed, coins, cash, trades, openFr
   for (const v of curve) { if (v > peak) peak = v; if (peak > 0) mdd = Math.max(mdd, (peak - v) / peak); }
   return {
     name, note, final, contributed, multiple: contributed ? final / contributed : 0,
-    maxDD: mdd * 100, trades, coins, cash, openFrom,
+    maxDD: mdd * 100, trades, coins, cash, openFrom, curve,
     cashPct: final > 0 ? (cash / final) * 100 : 0,
   };
 }
@@ -234,7 +234,7 @@ export function simulate(S, { buyMode = 'signal', sell = true, monthly = CFG.mon
   const { W, C, buySignal } = S;
   const sells = sellArr || S.sellSignal;
   let coins = 0, cash = 0, contributed = 0, units = 0, avgCost = 0, entry = null, entryI = null;
-  const curve = [], trades = [];
+  const curve = [], paidCurve = [], trades = [];
 
   for (let i = 0; i < W.length; i++) {
     const px = C[i];
@@ -254,6 +254,7 @@ export function simulate(S, { buyMode = 'signal', sell = true, monthly = CFG.mon
       cash += coins * px; coins = 0; units = 0; avgCost = 0; entry = null; entryI = null;
     }
     curve.push(cash + coins * px);
+    paidCurve.push(contributed);
   }
 
   const defName = buyMode === 'always'
@@ -264,7 +265,9 @@ export function simulate(S, { buyMode = 'signal', sell = true, monthly = CFG.mon
             : 'Invests every month and holds throughout.')
     : (sell ? 'Saves monthly, invests only when both buy conditions line up, and exits on the sell conditions.'
             : 'Saves monthly, invests only when both buy conditions line up, and holds.');
-  return stats(name || defName, note || defNote, W, C, curve, contributed, coins, cash, trades, entry);
+  const out = stats(name || defName, note || defNote, W, C, curve, contributed, coins, cash, trades, entry);
+  out.paidCurve = paidCurve;
+  return out;
 }
 
 export function buyHold(S, amount = 10000) {

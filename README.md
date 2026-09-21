@@ -52,9 +52,20 @@ stretches rather than being spread evenly.
 | Preset | Buy | Sell | Timing |
 |---|---|---|---|
 | **Selective** | RSI < 30 and %R < −80 | RSI > 90 and %R > −10 | buy either order within 8 weeks, sell same week |
-| **Sequential** | RSI < 30 then %R < −85 | RSI > 88 and %R > −5 | buy requires RSI first, %R within 26 weeks |
-| **More active** | RSI < 35 then %R < −70 | RSI > 78 and %R > −5 | looser on both sides |
+| **Sequential** | RSI < 30 and %R < −85, staggered | RSI > 88 and %R > −5 | either leg first, the other within 26 weeks |
+| **More active** | RSI < 35 and %R < −70, staggered | RSI > 78 and %R > −5 | looser on both sides |
 | **Failed high** | RSI < 30 and %R < −80 | price makes a new high, RSI does not | see below |
+
+### What "sequential" means
+
+The two indicators rarely reach their extremes in the same week, so the Sequential and More active presets
+wait for them to arrive **staggered**: one leg hits its extreme, and the signal fires when the other follows
+within the window. Crucially this works **in either direction**. RSI leading %R counts, and %R leading RSI
+counts equally.
+
+That matters. Across the ten buy episodes this produces, RSI led six times, %R led twice, and twice both legs
+were active on the completing week. An earlier version of this project only accepted RSI-leading, which
+silently discarded every %R-led entry, including the January 2015 and February 2026 bottoms.
 
 ### The failed-high exit
 
@@ -74,8 +85,8 @@ with Bitcoin at $81,235; the live page recomputes from current data and will dif
 | Preset | Trades | Median hold | Multiple | Worst dip | 2022 position |
 |---|---|---|---|---|---|
 | Selective | 2 | 30 mo | **829.7x** | 54% | still open |
-| Sequential | 3 | 24 mo | 254.2x | 53% | closed 2024-03 |
-| More active | 4 | 14 mo | 23.9x | **45%** | closed 2023-11 |
+| Sequential | 3 | 26 mo | 252.2x | 53% | closed 2024-03 |
+| More active | 4 | 15 mo | 22.4x | **46%** | closed 2023-11 |
 | Failed high | 3 | 36 mo | 149.6x | 53% | closed 2025-09 |
 
 Every trade under all four lasted months rather than weeks. The pattern is consistent and worth stating

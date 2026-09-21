@@ -66,6 +66,7 @@ function renderNow(S) {
   const orderText = (o, win) => o === 'sim' ? 'Both in the same week'
     : o === 'rw' ? `RSI first, %R within ${win} weeks`
     : o === 'wr' ? `%R first, RSI within ${win} weeks`
+    : o === 'seq' ? `Either one first, the other following within ${win} weeks`
     : `Both within ${win} weeks, either order`;
 
   $('buylegs').innerHTML =

@@ -77,12 +77,12 @@ export const PRESETS = [
     cfg: { buyRsi: 30, buyWpr: -80, buyOrder: 'either', buyWin: 8,
            sellRsi: 90, sellWpr: -10, sellOrder: 'sim', sellWin: 8 } },
   { id: 'sequential', label: 'Sequential',
-    blurb: 'Requires RSI to hit its extreme first and Williams %R to follow, rather than both together.',
-    cfg: { buyRsi: 30, buyWpr: -85, buyOrder: 'rw', buyWin: 26,
+    blurb: 'Requires the two indicators to reach their extremes in different weeks, one leading and the other confirming it later, in whichever order they happen to arrive.',
+    cfg: { buyRsi: 30, buyWpr: -85, buyOrder: 'seq', buyWin: 26,
            sellRsi: 88, sellWpr: -5, sellOrder: 'sim', sellWin: 8 } },
   { id: 'active', label: 'More active',
     blurb: 'Looser thresholds on both sides. More trades, still months long, noticeably smaller returns.',
-    cfg: { buyRsi: 35, buyWpr: -70, buyOrder: 'rw', buyWin: 26,
+    cfg: { buyRsi: 35, buyWpr: -70, buyOrder: 'seq', buyWin: 26,
            sellRsi: 78, sellWpr: -5, sellOrder: 'either', sellWin: 4 } },
   { id: 'failedhigh', label: 'Failed high',
     blurb: 'Exits when price makes a new high but RSI does not, having been overheated beforehand. Three completed trades, and the only preset that has closed the 2022 position.',
@@ -95,7 +95,9 @@ export const PRESETS = [
 //   sim    both true in the same week
 //   rw     condition A (RSI) fired earlier, B (%R) fires now
 //   wr     condition B (%R) fired earlier, A (RSI) fires now
-//   either both true within `win` weeks, in any order
+//   seq    either one fired earlier and the other completes it now, in either
+//          direction. Genuinely staggered: the same week never counts.
+//   either both true within `win` weeks, in any order, same week included
 export function combine(A, B, order, win) {
   const n = A.length;
   const out = new Array(n).fill(false);
@@ -110,6 +112,8 @@ export function combine(A, B, order, win) {
     if (order === 'sim') out[i] = A[i] && B[i];
     else if (order === 'rw') out[i] = B[i] && i - prevA >= 1 && i - prevA <= win;
     else if (order === 'wr') out[i] = A[i] && i - prevB >= 1 && i - prevB <= win;
+    else if (order === 'seq') out[i] = (B[i] && i - prevA >= 1 && i - prevA <= win)
+                                    || (A[i] && i - prevB >= 1 && i - prevB <= win);
     else out[i] = (i - lastA <= win) && (i - lastB <= win);
   }
   return out;

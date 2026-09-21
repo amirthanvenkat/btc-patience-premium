@@ -97,9 +97,23 @@ searched, none produced four or more trades that beat the two-trade Selective pr
 
 Not equally, and the page says so rather than implying a tidy symmetry.
 
-**On the buy side, Williams %R is inert.** Weekly RSI has dropped below 30 only **12 times since 2012**, and
-on **all 12** occasions %R was already below −80 within eight weeks. Removing the %R buy condition entirely
-produces an identical result: same 829.7x, same four entry dates. It has never excluded anything.
+**On the buy side the two legs do different jobs.** Weekly RSI has closed below 30 only **12 times since
+2012**, and on **all 12** occasions %R was already below −80 within eight weeks, so **%R has never vetoed an
+entry** — the entry dates are identical with or without it.
+
+It is not redundant though. %R holds the buying window open longer, and a longer window means more monthly
+contributions land while the price is still low:
+
+| Window opened | With %R | RSI only |
+|---|---|---|
+| 2015-01-12 | 9 weeks | 1 week |
+| 2018-12-10 | 9 weeks | 1 week |
+| 2022-06-13 | 13 weeks | 5 weeks |
+| 2026-02-02 | 13 weeks | 5 weeks |
+
+Removing it costs real return: Selective 829.7x → 794.4x, Failed high 149.6x → 144.5x. For the two presets
+that use the `seq` mode it is structurally load-bearing, since a staggered sequence needs two legs to
+stagger — Sequential falls to 227.7x and loses six of its ten entries.
 
 **On the sell side it genuinely binds.** Dropping the %R requirement takes Selective from 829.7x to 658.5x,
 so the confluence is doing real work at tops.

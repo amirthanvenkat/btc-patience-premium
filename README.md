@@ -93,6 +93,45 @@ Every trade under all four lasted months rather than weeks. The pattern is consi
 plainly: **each extra trade cost return**, though it also reduced the worst dip. Out of 163,840 combinations
 searched, none produced four or more trades that beat the two-trade Selective preset.
 
+## Are both indicators actually needed?
+
+Not equally, and the page says so rather than implying a tidy symmetry.
+
+**On the buy side, Williams %R is inert.** Weekly RSI has dropped below 30 only **12 times since 2012**, and
+on **all 12** occasions %R was already below −80 within eight weeks. Removing the %R buy condition entirely
+produces an identical result: same 829.7x, same four entry dates. It has never excluded anything.
+
+**On the sell side it genuinely binds.** Dropping the %R requirement takes Selective from 829.7x to 658.5x,
+so the confluence is doing real work at tops.
+
+## Does lowering the thresholds help?
+
+No. Both live at a sharp optimum and move away from it in either direction.
+
+| Buy RSI | Selective | Sequential |
+|---|---|---|
+| 20 or 25 | no signals at all | no signals at all |
+| **30** | **829.7x** | **252.2x** |
+| 35 | 272.5x | 90.4x |
+| 40 | 176.7x | 45.5x |
+
+| Sell RSI | Selective | Sequential |
+|---|---|---|
+| 75 | 5.5x | 5.7x |
+| 80 | 14.7x | 15.2x |
+| 85 | 35.4x | 37.0x |
+| 88 | 108.9x | 115.9x |
+| **90** | **829.7x** | **891.4x** |
+| 92 | 149.8x | 159.5x |
+| 95 | no trades | no trades |
+
+The buy %R threshold makes essentially no difference anywhere between −70 and −85, which is the redundancy
+described above. Lowering the sell RSI is actively destructive: at 75 it gives up more than 99% of the return.
+
+Across the full 1,044-combination grid the best setting reaches 892.5x, but only **19% of its immediate
+neighbours reach even half that**. That is a spike rather than a plateau, which is the signature of a result
+fitted to this particular history. Nothing here was retuned on the strength of it.
+
 ## Do the two indicators peak together?
 
 No, and this turned out to be the most interesting thing in the data.

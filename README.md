@@ -23,7 +23,7 @@ tuning to be true.
 | Finding | Figure |
 |---|---|
 | Share of all weeks followed by a higher price **three years** later | **99%** |
-| Buying $1,000 monthly since 2012 and never selling | **1,007x** ($178,000 → $179.3m) |
+| Buying $1,000 monthly since 2012 and never selling | **1,006x** ($178,000 → $179.1m) |
 | Buying signals so far followed by a higher price | **4 of 4** |
 
 Holding period mattered more than entry timing:
@@ -79,15 +79,16 @@ because pretending you could sell on the peak week would be using information th
 
 ## Results
 
-Weekly data, 2011-12 to 2026-09, paying in $1,000 a month. **Figures below are a snapshot taken 2026-09-20
-with Bitcoin at $81,235; the live page recomputes from current data and will differ.**
+Weekly data, 2011-12 to 2026-09, paying in $1,000 a month. **Figures below are a snapshot taken 2026-09-21,
+weekly series through 2026-09-14, with Bitcoin at $81,152. The live page recomputes from current data and
+will differ.**
 
 | Preset | Trades | Median hold | Multiple | Worst dip | 2022 position |
 |---|---|---|---|---|---|
-| Selective | 2 | 30 mo | **794.4x** | 54% | still open |
-| Sequential | 3 | 26 mo | 252.2x | 53% | closed 2024-03 |
+| Selective | 2 | 30 mo | **793.6x** | 54% | still open |
+| Sequential | 3 | 26 mo | 252.0x | 53% | closed 2024-03 |
 | More active | 4 | 15 mo | 22.4x | **46%** | closed 2023-11 |
-| Failed high | 3 | 36 mo | 144.5x | 52% | closed 2025-09 |
+| Failed high | 3 | 36 mo | 144.4x | 52% | closed 2025-09 |
 
 Every trade under all four lasted months rather than weeks. The pattern is consistent and worth stating
 plainly: **each extra trade cost return**, though it also reduced the worst dip. Out of 163,840 combinations
@@ -113,43 +114,49 @@ monthly contributions land while the price is still low:
 
 **Selective and Failed high now buy on RSI alone.** Both use the order-agnostic mode where the entry dates
 are provably unchanged, so the second condition was dropped in favour of a rule that is simpler to state and
-honest about what is doing the work. It costs about 4%: Selective 829.7x → **794.4x**, Failed high
-149.6x → **144.5x**. Both figures in the results table above reflect the simpler rule.
+honest about what is doing the work. It costs about 4%: Selective 828.8x → **793.6x**, Failed high
+149.5x → **144.4x**. Both figures in the results table above reflect the simpler rule.
 
 **Sequential and More active keep it**, because for them it is structurally load-bearing: the `seq` mode is
 defined as the two readings arriving in different weeks, and a staggered sequence needs two legs to stagger.
-Removing it there takes Sequential to 227.7x and costs six of its ten entries.
+Removing it there takes Sequential to 227.5x and costs six of its ten entries.
 
-**On the sell side it genuinely binds.** Dropping the %R requirement takes Selective from 829.7x to 658.5x,
+**On the sell side it genuinely binds.** Dropping the %R requirement takes Selective from 793.6x to 629.9x,
 so the confluence is doing real work at tops.
 
 ## Does lowering the thresholds help?
 
 No. Both live at a sharp optimum and move away from it in either direction.
 
-These were measured with the two-leg buy rule in place, before Selective dropped its %R leg.
+Measured on the presets as shipped.
 
 | Buy RSI | Selective | Sequential |
 |---|---|---|
 | 20 or 25 | no signals at all | no signals at all |
-| **30** | **829.7x** | **252.2x** |
-| 35 | 272.5x | 90.4x |
-| 40 | 176.7x | 45.5x |
+| **30** | **793.6x** | **252.0x** |
+| 35 | 270.7x | 90.3x |
+| 40 | 173.5x | 45.5x |
+
+Each preset carries its own %R sell level, so the two columns are not directly comparable; only the RSI
+level changes down each one. The shipped level is bold.
 
 | Sell RSI | Selective | Sequential |
 |---|---|---|
-| 75 | 5.5x | 5.7x |
-| 80 | 14.7x | 15.2x |
-| 85 | 35.4x | 37.0x |
-| 88 | 108.9x | 115.9x |
-| **90** | **829.7x** | **891.4x** |
-| 92 | 149.8x | 159.5x |
+| 75 | 5.4x | 6.3x |
+| 80 | 14.3x | 38.5x |
+| 85 | 34.3x | 75.4x |
+| 88 | 131.5x | **252.0x** |
+| **90** | **793.6x** | 553.5x |
+| 92 | 143.8x | no trades |
 | 95 | no trades | no trades |
 
-The buy %R threshold makes essentially no difference anywhere between −70 and −85, which is the redundancy
-described above. Lowering the sell RSI is actively destructive: at 75 it gives up more than 99% of the return.
+Sequential's shipped level of 88 is not the top of its column: 90 would reach 553.5x. It was left at 88
+because that is what produces its three completed trades, and because the peak of the wider grid is a spike
+rather than a plateau, as below.
 
-Across the full 1,044-combination grid the best setting reaches 892.5x, but only **19% of its immediate
+Lowering the sell RSI is actively destructive: at 75 Selective gives up more than 99% of its return.
+
+Across the full 1,044-combination grid the best setting reaches 891.6x, but only **19% of its immediate
 neighbours reach even half that**. That is a spike rather than a plateau, which is the signature of a result
 fitted to this particular history. Nothing here was retuned on the strength of it.
 

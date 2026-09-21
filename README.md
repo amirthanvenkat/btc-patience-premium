@@ -51,10 +51,10 @@ stretches rather than being spread evenly.
 
 | Preset | Buy | Sell | Timing |
 |---|---|---|---|
-| **Selective** | RSI < 30 and %R < −80 | RSI > 90 and %R > −10 | buy either order within 8 weeks, sell same week |
+| **Selective** | RSI < 30 | RSI > 90 and %R > −10 | RSI alone on the buy side, sell same week |
 | **Sequential** | RSI < 30 and %R < −85, staggered | RSI > 88 and %R > −5 | either leg first, the other within 26 weeks |
 | **More active** | RSI < 35 and %R < −70, staggered | RSI > 78 and %R > −5 | looser on both sides |
-| **Failed high** | RSI < 30 and %R < −80 | price makes a new high, RSI does not | see below |
+| **Failed high** | RSI < 30 | price makes a new high, RSI does not | RSI alone on the buy side, exit below |
 
 ### What "sequential" means
 
@@ -84,10 +84,10 @@ with Bitcoin at $81,235; the live page recomputes from current data and will dif
 
 | Preset | Trades | Median hold | Multiple | Worst dip | 2022 position |
 |---|---|---|---|---|---|
-| Selective | 2 | 30 mo | **829.7x** | 54% | still open |
+| Selective | 2 | 30 mo | **794.4x** | 54% | still open |
 | Sequential | 3 | 26 mo | 252.2x | 53% | closed 2024-03 |
 | More active | 4 | 15 mo | 22.4x | **46%** | closed 2023-11 |
-| Failed high | 3 | 36 mo | 149.6x | 53% | closed 2025-09 |
+| Failed high | 3 | 36 mo | 144.5x | 52% | closed 2025-09 |
 
 Every trade under all four lasted months rather than weeks. The pattern is consistent and worth stating
 plainly: **each extra trade cost return**, though it also reduced the worst dip. Out of 163,840 combinations
@@ -101,8 +101,8 @@ Not equally, and the page says so rather than implying a tidy symmetry.
 2012**, and on **all 12** occasions %R was already below −80 within eight weeks, so **%R has never vetoed an
 entry** — the entry dates are identical with or without it.
 
-It is not redundant though. %R holds the buying window open longer, and a longer window means more monthly
-contributions land while the price is still low:
+It is not free to remove, though. %R holds the buying window open longer, and a longer window means more
+monthly contributions land while the price is still low:
 
 | Window opened | With %R | RSI only |
 |---|---|---|
@@ -111,9 +111,14 @@ contributions land while the price is still low:
 | 2022-06-13 | 13 weeks | 5 weeks |
 | 2026-02-02 | 13 weeks | 5 weeks |
 
-Removing it costs real return: Selective 829.7x → 794.4x, Failed high 149.6x → 144.5x. For the two presets
-that use the `seq` mode it is structurally load-bearing, since a staggered sequence needs two legs to
-stagger — Sequential falls to 227.7x and loses six of its ten entries.
+**Selective and Failed high now buy on RSI alone.** Both use the order-agnostic mode where the entry dates
+are provably unchanged, so the second condition was dropped in favour of a rule that is simpler to state and
+honest about what is doing the work. It costs about 4%: Selective 829.7x → **794.4x**, Failed high
+149.6x → **144.5x**. Both figures in the results table above reflect the simpler rule.
+
+**Sequential and More active keep it**, because for them it is structurally load-bearing: the `seq` mode is
+defined as the two readings arriving in different weeks, and a staggered sequence needs two legs to stagger.
+Removing it there takes Sequential to 227.7x and costs six of its ten entries.
 
 **On the sell side it genuinely binds.** Dropping the %R requirement takes Selective from 829.7x to 658.5x,
 so the confluence is doing real work at tops.
@@ -121,6 +126,8 @@ so the confluence is doing real work at tops.
 ## Does lowering the thresholds help?
 
 No. Both live at a sharp optimum and move away from it in either direction.
+
+These were measured with the two-leg buy rule in place, before Selective dropped its %R leg.
 
 | Buy RSI | Selective | Sequential |
 |---|---|---|

@@ -61,6 +61,7 @@ export function toWeekly(daily) {
 
 export const CFG = {
   rsiLen: 14, wprLen: 14, wmaLen: 100,
+  // buyWpr: null means the buy rule is RSI alone, with no Williams %R leg.
   buyRsi: 30, buyWpr: -80, buyOrder: 'either', buyWin: 8,
   sellMode: 'confluence',
   sellRsi: 90, sellWpr: -10, sellOrder: 'sim', sellWin: 8,
@@ -74,7 +75,7 @@ export const CFG = {
 export const PRESETS = [
   { id: 'selective', label: 'Selective',
     blurb: 'Waits for the most extreme readings. Fewest trades, largest gains, deepest dips.',
-    cfg: { buyRsi: 30, buyWpr: -80, buyOrder: 'either', buyWin: 8,
+    cfg: { buyRsi: 30, buyWpr: null,
            sellRsi: 90, sellWpr: -10, sellOrder: 'sim', sellWin: 8 } },
   { id: 'sequential', label: 'Sequential',
     blurb: 'Requires the two indicators to reach their extremes in different weeks, one leading and the other confirming it later, in whichever order they happen to arrive.',
@@ -86,7 +87,7 @@ export const PRESETS = [
            sellRsi: 78, sellWpr: -5, sellOrder: 'either', sellWin: 4 } },
   { id: 'failedhigh', label: 'Failed high',
     blurb: 'Exits when price makes a new high but RSI does not, having been overheated beforehand. Three completed trades, and the only preset that has closed the 2022 position.',
-    cfg: { buyRsi: 30, buyWpr: -80, buyOrder: 'either', buyWin: 8,
+    cfg: { buyRsi: 30, buyWpr: null,
            sellMode: 'failedHigh',
            fhPivot: 6, fhRefRsi: 65, fhMinGap: 20, fhMaxGap: 40, fhArm: 80, fhArmWin: 78 } },
 ];
@@ -167,11 +168,15 @@ export function computeWeekly(daily, cfg = {}) {
   const wm = wma(C, o.wmaLen);
 
   const rsiLow = r.map(x => x !== null && x < o.buyRsi);
-  const wprLow = pr.map(x => x !== null && x < o.buyWpr);
+  // A null threshold switches the leg off entirely rather than setting it to a
+  // value that is almost always true, which would still drag the window along.
+  const wprLow = o.buyWpr === null ? r.map(() => false)
+                                   : pr.map(x => x !== null && x < o.buyWpr);
   const rsiHigh = r.map(x => x !== null && x > o.sellRsi);
   const wprHigh = pr.map(x => x !== null && x > o.sellWpr);
 
-  const buySignal = combine(rsiLow, wprLow, o.buyOrder, o.buyWin);
+  const buySignal = o.buyWpr === null ? rsiLow.slice()
+                                     : combine(rsiLow, wprLow, o.buyOrder, o.buyWin);
   let sellSignal, sellMeta = new Map();
   if (o.sellMode === 'failedHigh') {
     const fh = failedHigh(W, C, r, o);

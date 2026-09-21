@@ -69,10 +69,13 @@ function renderNow(S) {
     : o === 'seq' ? `Either one first, the other following within ${win} weeks`
     : `Both within ${win} weeks, either order`;
 
-  $('buylegs').innerHTML =
-    leg(S.rsiLow[i], 'Weekly RSI', r === null ? 'n/a' : r.toFixed(1), `Under ${c.buyRsi}`) +
-    leg(S.wprLow[i], 'Williams %R', pr === null ? 'n/a' : pr.toFixed(1), `Under ${c.buyWpr}`) +
-    `<p class="sm dim" style="margin:2px 0 0">${orderText(c.buyOrder, c.buyWin)}</p>`;
+  $('buylegs').innerHTML = c.buyWpr === null
+    ? leg(S.rsiLow[i], 'Weekly RSI', r === null ? 'n/a' : r.toFixed(1), `Under ${c.buyRsi}`) +
+      `<p class="sm dim" style="margin:2px 0 0">This preset buys on RSI alone. Williams %R never changed
+         which lows were caught, so it was dropped here.</p>`
+    : leg(S.rsiLow[i], 'Weekly RSI', r === null ? 'n/a' : r.toFixed(1), `Under ${c.buyRsi}`) +
+      leg(S.wprLow[i], 'Williams %R', pr === null ? 'n/a' : pr.toFixed(1), `Under ${c.buyWpr}`) +
+      `<p class="sm dim" style="margin:2px 0 0">${orderText(c.buyOrder, c.buyWin)}</p>`;
 
   if (c.sellMode === 'failedHigh') {
     const hot = [];

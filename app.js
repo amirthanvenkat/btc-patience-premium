@@ -3,6 +3,20 @@ import { computeWeekly, runAll, buyEpisodes, buyHold, thresholdSweep, leadLag, P
 import { priceChart, equityChart } from './chart.js';
 
 const $ = id => document.getElementById(id);
+
+// Tables can be wider than the card on narrow screens, so each one gets its own
+// horizontal scroller. Captions and notes must stay outside that scroller: if
+// they share it they are pinned to the table's width and slide sideways when the
+// table is scrolled, which is what made them look misaligned and cut off.
+function wrapTables(root = document) {
+  root.querySelectorAll('table').forEach(t => {
+    if (t.parentElement && t.parentElement.classList.contains('tblwrap')) return;
+    const w = document.createElement('div');
+    w.className = 'tblwrap';
+    t.parentNode.insertBefore(w, t);
+    w.appendChild(t);
+  });
+}
 const usd = n => '$' + Math.round(n).toLocaleString('en-US');
 const pct = (n, d = 0) => (n >= 0 ? '+' : '') + n.toFixed(d) + '%';
 const months = w => (w / 4.345).toFixed(0);
@@ -21,6 +35,7 @@ let DAILY = null, SOURCE = '', CURRENT = PRESETS[0].id;
     renderSimple();
     renderLeadLag();
     renderPresetTable();
+    wrapTables();
     $('loading').style.display = 'none';
     $('main').hidden = false;
   } catch (e) {
@@ -49,6 +64,7 @@ function apply(preset) {
   renderSweep(S);
   renderTrades(S);
   renderWindows(S);
+  wrapTables();
 }
 
 /* ---------------- live state ---------------- */
@@ -121,18 +137,19 @@ function renderResults(S) {
   const lump = buyHold(S);
   $('results').innerHTML = `
     <table>
-      <thead><tr><th>Approach</th><th class="num">Paid in</th><th class="num">Ended with</th><th class="num">Multiple</th><th class="num">Worst dip</th><th class="num">Sells</th></tr></thead>
+      <thead><tr><th>Approach</th><th class="num">Ended with</th><th class="num">Multiple</th><th class="num">Worst dip</th><th class="num">Sells</th></tr></thead>
       <tbody>${runs.map(x => `
         <tr class="${x === hero ? 'hl' : ''}">
           <td><strong>${x.name}</strong><span class="sm">${x.note}</span></td>
-          <td class="num">${usd(x.contributed)}</td><td class="num">${usd(x.final)}</td>
+          <td class="num">${usd(x.final)}</td>
           <td class="num">${x.multiple.toFixed(1)}x</td>
           <td class="num dim">${x.maxDD.toFixed(0)}%</td>
           <td class="num dim">${x.trades.length}</td>
         </tr>`).join('')}
       </tbody>
     </table>
-    <p class="sm dim">Weekly data, ${S.W[0].date} to ${S.W[i].date}, paying in ${usd(S.cfg.monthly)} a month.
+    <p class="sm dim">Weekly data, ${S.W[0].date} to ${S.W[i].date}. Every monthly approach pays in
+       ${usd(S.cfg.monthly)} a month, ${usd(runs[0].contributed)} in total.
        A ${usd(10000)} lump sum left untouched would have become ${usd(lump.final)}.
        Costs and tax excluded.</p>`;
   const eq = $('equity');
@@ -306,11 +323,11 @@ function renderSimple() {
   ];
   $('simple').innerHTML = `
     <table>
-      <thead><tr><th>Approach</th><th class="num">Paid in</th><th class="num">Ended with</th><th class="num">Multiple</th><th class="num">Worst dip</th></tr></thead>
+      <thead><tr><th>Approach</th><th class="num">Ended with</th><th class="num">Multiple</th><th class="num">Worst dip</th></tr></thead>
       <tbody>${ordered.map((x, i) => `
         <tr class="${i === 0 ? 'hl' : ''}">
           <td><strong>${x.tagline}</strong></td>
-          <td class="num">${usd(x.contributed)}</td><td class="num">${usd(x.final)}</td>
+          <td class="num">${usd(x.final)}</td>
           <td class="num">${x.multiple.toFixed(0)}x</td>
           <td class="num dim">${x.maxDD.toFixed(0)}%</td>
         </tr>`).join('')}
@@ -361,20 +378,20 @@ function renderPresetTable() {
   });
   $('presettable').innerHTML = `
     <table>
-      <thead><tr><th>Preset</th><th class="num">Trades</th><th class="num">Median hold</th><th class="num">Shortest hold</th><th class="num">Ended with</th><th class="num">Multiple</th><th class="num">Worst dip</th></tr></thead>
+      <thead><tr><th>Preset</th><th class="num">Trades</th><th class="num">Median hold</th><th class="num">Ended with</th><th class="num">Multiple</th><th class="num">Worst dip</th></tr></thead>
       <tbody>${rows.map(x => `
         <tr class="${x.p.id === 'selective' ? 'hl' : ''}">
           <td><strong>${x.p.label}</strong><span class="sm">${x.p.blurb}</span></td>
           <td class="num">${x.hero.trades.length}</td>
           <td class="num dim">${x.med.toFixed(0)} mo</td>
-          <td class="num dim">${x.min.toFixed(0)} mo</td>
           <td class="num">${usd(x.hero.final)}</td>
           <td class="num">${x.hero.multiple.toFixed(1)}x</td>
           <td class="num dim">${x.hero.maxDD.toFixed(0)}%</td>
         </tr>`).join('')}
       </tbody>
     </table>
-    <p class="sm dim">Every trade under all three presets lasted months rather than weeks. The pattern is
+    <p class="sm dim">Every trade under all of these lasted months rather than weeks, the shortest
+       being ${Math.min(...rows.map(x => x.min)).toFixed(0)} months. The pattern is
        consistent: loosening the thresholds to get more signals reduced the return each time, though it also
        reduced the worst dip.</p>`;
 }

@@ -118,7 +118,7 @@
 
   table{width:100%;border-collapse:collapse;font-size:.91rem}
   th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-  thead th{color:var(--dim);font-size:.76rem;letter-spacing:.05em;text-transform:uppercase;font-weight:650;white-space:nowrap}
+  thead th{color:var(--dim);font-size:.76rem;letter-spacing:.05em;text-transform:uppercase;font-weight:650;line-height:1.25}
   tbody tr:last-child td{border-bottom:0}
   td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   td.num .sm{text-align:right}
@@ -128,7 +128,19 @@
   .dim{color:var(--dim)} .up{color:var(--up)} .down{color:var(--down)} .bad{color:var(--down)}
   .tag{background:color-mix(in srgb,var(--accent) 20%,transparent);color:var(--accent);
     font-size:.68rem;padding:2px 7px;border-radius:99px;font-weight:650;white-space:nowrap}
-  .tblwrap{overflow-x:auto}
+  /* Edge shadows appear only while there is more table to scroll to, so a cut
+     off table reads as scrollable rather than broken. */
+  .tblwrap{overflow-x:auto;overscroll-behavior-x:contain;
+    background:
+      linear-gradient(to right, var(--card) 40%, transparent) left/26px 100% no-repeat local,
+      linear-gradient(to left,  var(--card) 40%, transparent) right/26px 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.30), transparent) left/14px 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.30), transparent) right/14px 100% no-repeat scroll}
+  .tblwrap table{margin:0}
+  @media (max-width:700px){
+    th,td{padding:9px 7px;font-size:.86rem}
+    thead th{font-size:.68rem;letter-spacing:.03em}
+  }
   .note{background:var(--card2);border-radius:11px;padding:14px 16px;margin-top:14px;font-size:.93rem}
 
   .bars{display:grid;gap:10px;margin-top:6px}
@@ -204,7 +216,7 @@
     <h2>The simplest approach did best of all</h2>
     <p class="lead-in">I tested a lot of clever rules on this data. The one that made the most money needed
        no charts, no timing and no skill: buy the same amount every month and never sell.</p>
-    <div class="card"><div class="tblwrap" id="simple"></div></div>
+    <div class="card"><div id="simple"></div></div>
   </section>
 
   <section>
@@ -273,7 +285,7 @@
   <section>
     <h2>Every buying signal so far</h2>
     <p class="lead-in" id="epilead"></p>
-    <div class="card"><div class="tblwrap" id="windows"></div></div>
+    <div class="card"><div id="windows"></div></div>
   </section>
 
   <section>
@@ -285,7 +297,7 @@
       <p class="sm dim" id="presetblurb"></p>
     </div>
     <div class="card">
-      <div class="tblwrap" id="results"></div>
+      <div id="results"></div>
       <div class="note" id="resultnote"></div>
     </div>
   </section>
@@ -304,26 +316,26 @@
   <section>
     <h2>Every completed trade</h2>
     <p class="sectionsub">What this preset actually did, start to finish.</p>
-    <div class="card"><div class="tblwrap" id="trades"></div></div>
+    <div class="card"><div id="trades"></div></div>
   </section>
 
   <section>
     <h2>How much the sell level matters</h2>
     <p class="sectionsub">The same rule run at different RSI levels for selling.</p>
-    <div class="card"><div class="tblwrap" id="sweep"></div></div>
+    <div class="card"><div id="sweep"></div></div>
   </section>
 
   <section>
     <h2>More signals, or bigger ones?</h2>
     <p class="sectionsub">The four presets side by side.</p>
-    <div class="card"><div class="tblwrap" id="presettable"></div></div>
+    <div class="card"><div id="presettable"></div></div>
   </section>
 
   <section>
     <h2>Do the two indicators peak together?</h2>
     <p class="sectionsub">No, and the gap between them is bigger than you might expect.</p>
     <div class="card">
-      <div class="tblwrap" id="leadlag"></div>
+      <div id="leadlag"></div>
       <div class="note" id="leadlagnote"></div>
     </div>
   </section>

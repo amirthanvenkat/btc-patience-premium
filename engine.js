@@ -76,26 +76,23 @@ export const CFG = {
   from: '2017-12-11',
 };
 
-// Three presets sitting at different points on the same trade-off:
-// fewer, larger trades at one end and more, smaller ones at the other.
+// Every preset sells on the failed high. A fixed RSI level was tried first and
+// could not find cycle tops: weekly RSI peaks months before price does, and its
+// peaks have shrunk each cycle, so a level high enough to wait for the top stops
+// firing at all. The presets therefore differ only in how they buy.
+const FAILED_HIGH = { sellMode: 'failedHigh',
+                      fhPivot: 6, fhRefRsi: 65, fhMinGap: 20, fhMaxGap: 40, fhArm: 80, fhArmWin: 78 };
+
 export const PRESETS = [
   { id: 'selective', label: 'Selective',
-    blurb: 'Waits for the most extreme readings. Fewest trades, and long stretches spent in cash between them.',
-    cfg: { buyRsi: 30, buyWpr: null,
-           sellRsi: 90, sellWpr: -10, sellOrder: 'sim', sellWin: 8 } },
+    blurb: 'Buys only on the most extreme reading, RSI below 30 on its own. The fewest buying weeks.',
+    cfg: { buyRsi: 30, buyWpr: null, ...FAILED_HIGH } },
   { id: 'sequential', label: 'Sequential',
     blurb: 'Requires the two indicators to reach their extremes in different weeks, one leading and the other confirming it later, in whichever order they happen to arrive.',
-    cfg: { buyRsi: 30, buyWpr: -85, buyOrder: 'seq', buyWin: 26,
-           sellRsi: 88, sellWpr: -5, sellOrder: 'sim', sellWin: 8 } },
+    cfg: { buyRsi: 30, buyWpr: -85, buyOrder: 'seq', buyWin: 26, ...FAILED_HIGH } },
   { id: 'active', label: 'More active',
-    blurb: 'Looser thresholds on both sides. More trades, each still months long.',
-    cfg: { buyRsi: 35, buyWpr: -70, buyOrder: 'seq', buyWin: 26,
-           sellRsi: 78, sellWpr: -5, sellOrder: 'either', sellWin: 4 } },
-  { id: 'failedhigh', label: 'Failed high',
-    blurb: 'Exits when price makes a new high but RSI does not, having been overheated beforehand. Closes the position after each cycle top rather than on it, and the only preset that has closed the 2022 position.',
-    cfg: { buyRsi: 30, buyWpr: null,
-           sellMode: 'failedHigh',
-           fhPivot: 6, fhRefRsi: 65, fhMinGap: 20, fhMaxGap: 40, fhArm: 80, fhArmWin: 78 } },
+    blurb: 'Looser buying thresholds, so it buys in more weeks and at somewhat higher prices.',
+    cfg: { buyRsi: 35, buyWpr: -70, buyOrder: 'seq', buyWin: 26, ...FAILED_HIGH } },
 ];
 
 // Combine two conditions under one of four timing rules.

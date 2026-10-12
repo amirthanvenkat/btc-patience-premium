@@ -244,7 +244,7 @@
        <strong>Williams %R</strong> asks where this week's price sits inside its recent range, from 0 at the
        very top to −100 at the very bottom. When both agree that things are extreme, that has tended to be
        a moment worth noticing. They are not equally important at both ends though: at lows RSI does the
-       deciding, while at highs the two genuinely have to agree.</p>
+       deciding, while at highs neither reading is enough by itself and the shape of the peaks matters more.</p>
     <div class="card">
       <div class="rulegrid">
         <div class="rule">
@@ -252,21 +252,22 @@
           <div class="cond"><code>RSI below 30</code></div>
           <p class="sm" style="margin:10px 0 0">Deeply oversold: the price has fallen hard and fast. This is
              a rare reading, hit only twelve times in the full history back to 2012, and it is the condition that decides which
-             lows qualify. Two of the four presets add a second requirement, Williams %R below −80. That
+             lows qualify. Two of the three presets add a second requirement, Williams %R below −80. That
              leg never vetoes an entry, because %R was already below −80 on every one of those twelve
              occasions. What it does is hold the buying window open for longer, so more of the monthly
-             savings go in while the price is still down. Selective and Failed high leave it out and buy on
+             savings go in while the price is still down. Selective leaves it out and buys on
              RSI alone; Sequential and More active keep it, and need it, because they are built on the two
              readings arriving in different weeks.</p>
         </div>
         <div class="rule">
           <h4>A selling signal</h4>
-          <div class="cond"><code>RSI above 90</code></div>
-          <div class="amp">and</div>
-          <div class="cond"><code>Williams %R above −10</code></div>
-          <p class="sm" style="margin:10px 0 0">Both stretched to an extreme at once, which has only happened
-             near major peaks. Here the second condition genuinely bites: dropping the Williams %R
-             requirement changes the outcome materially, unlike on the buy side. The exact levels differ by preset.</p>
+          <div class="cond"><code>RSI was above 80</code></div>
+          <div class="amp">then</div>
+          <div class="cond"><code>a new price high that RSI does not match</code></div>
+          <p class="sm" style="margin:10px 0 0">Called a failed high. The market first runs hot, then the price
+             pushes to a new peak with less force behind it than the last one. Selling at a fixed RSI level was
+             tried first and sold far too early, because RSI peaks months before the price does. A peak can only
+             be recognised a few weeks after it forms, so this sale always lands a little below the top.</p>
         </div>
       </div>
     </div>
@@ -289,9 +290,9 @@
   </section>
 
   <section>
-    <h2>Four ways of using the signals</h2>
-    <p class="sectionsub">Switching between these changes every table below. They differ in how patient they
-       are, not in what they measure.</p>
+    <h2>Three ways of using the signals</h2>
+    <p class="sectionsub">Switching between these changes every table below. They all sell the same way and differ
+       only in how picky they are about buying.</p>
     <div class="pickerbar">
       <div id="presets" class="picker"></div>
       <p class="sm dim" id="presetblurb"></p>
@@ -320,14 +321,14 @@
   </section>
 
   <section>
-    <h2>How much the sell level matters</h2>
-    <p class="sectionsub">The same rule run at different RSI levels for selling.</p>
+    <h2>Why not sell at a fixed RSI level?</h2>
+    <p class="sectionsub">The same buying rule, with the sale made at a set RSI level instead of on the failed high.</p>
     <div class="card"><div id="sweep"></div></div>
   </section>
 
   <section>
     <h2>More signals, or bigger ones?</h2>
-    <p class="sectionsub">The four presets side by side.</p>
+    <p class="sectionsub">The three presets side by side.</p>
     <div class="card"><div id="presettable"></div></div>
   </section>
 

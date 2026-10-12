@@ -173,9 +173,34 @@ function renderResults(S) {
 
 function renderSweep(S) {
   if (S.cfg.sellMode === 'failedHigh') {
-    $('sweep').innerHTML = `<p class="dim">This preset does not use an RSI level to sell, so there is no
-      level to vary. Its exit depends on the shape of the peaks instead: price making a new high while RSI
-      does not. Switch to one of the other presets to see the sensitivity table.</p>`;
+    // Same buys, with the sale moved to a fixed RSI level, set against what the
+    // failed high actually did. The top is the highest weekly close from the
+    // purchase to six months after the sale, so a top that came after the
+    // sale still counts against it.
+    const hero = runAll(S)[0];
+    const sweep = thresholdSweep(S, [80, 85, 88, 90]);
+    const give = hero.trades.map(t => {
+      let top = 0;
+      const x = S.W.findIndex(w => w.date === t.exit);
+      S.W.forEach((w, k) => { if (w.date >= t.entry && k <= x + 26 && S.C[k] > top) top = S.C[k]; });
+      return (t.exitPx / top - 1) * 100;
+    });
+    $('sweep').innerHTML = `
+      <table>
+        <thead><tr><th>Sell when</th><th class="num">Sells</th><th class="num">Ended with</th><th class="num">Multiple</th></tr></thead>
+        <tbody>${sweep.map(x => `
+          <tr><td>RSI over ${x.level} and Williams %R over ${S.cfg.sellWpr}</td><td class="num dim">${x.sells}</td>
+            <td class="num">${usd(x.final)}</td><td class="num">${x.multiple.toFixed(1)}x</td></tr>`).join('')}
+          <tr class="hl"><td>Failed high <span class="tag">in use</span></td><td class="num dim">${hero.trades.length}</td>
+            <td class="num">${usd(hero.final)}</td><td class="num">${hero.multiple.toFixed(1)}x</td></tr>
+        </tbody>
+      </table>
+      <p class="sm dim">A low level sells early in the climb and a high one stops firing, because weekly RSI
+         peaks months before the price and has peaked lower each cycle.
+         ${give.length ? `The failed high sold ${give.map(g => Math.abs(g).toFixed(0) + '%').join(' and ')}
+         below the highest weekly close of each cycle.` : ''} That rests on ${hero.trades.length}
+         sale${hero.trades.length === 1 ? '' : 's'}, so it shows the rule fitting recent tops, not that it will
+         find the next one.</p>`;
     return;
   }
   const sweep = thresholdSweep(S);
@@ -405,10 +430,9 @@ function renderPresetTable() {
         </tr>`).join('')}
       </tbody>
     </table>
-    <p class="sm dim">Every trade under all of these lasted months rather than weeks, the shortest
-       being ${Math.min(...rows.map(x => x.min)).toFixed(0)} months. The pattern is
-       that more trades did not reliably mean more return: results moved around with the window and the
-       thresholds rather than rising or falling in a line.</p>`;
+    <p class="sm dim">All three sell on the same weeks, so the differences come entirely from buying.
+       Every trade lasted years rather than weeks, the shortest being
+       ${Math.min(...rows.map(x => x.min)).toFixed(0)} months.</p>`;
 }
 
 function median(a) {

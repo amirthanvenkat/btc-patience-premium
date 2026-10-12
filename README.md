@@ -31,11 +31,11 @@ low is itself a buy signal, so a rule that waits for signals walks into the best
 one month of cash. Starting a year earlier lets savings build first, which is what a real saver would have
 had. It also puts the whole 2018 bear market inside the window.
 
-| Window starts | Selective | Sequential | More active | Failed high | Monthly, never sell |
-|---|---|---|---|---|---|
-| **2017-12-11 (peak, shipped)** | **7.3x** | **11.6x** | **6.7x** | **15.6x** | **5.1x** |
-| 2018-12-10 (low) | 2.9x | 4.0x | 3.9x | 4.6x | 4.5x |
-| 2020-01-06 | 2.3x | 2.4x | 1.8x | 3.2x | 2.9x |
+| Window starts | Selective | Sequential | More active | Monthly, never sell |
+|---|---|---|---|---|
+| **2017-12-11 (peak, shipped)** | **15.6x** | **16.6x** | **13.9x** | **5.1x** |
+| 2018-12-10 (low) | 4.6x | 5.8x | 9.2x | 4.5x |
+| 2020-01-06 | 3.2x | 3.5x | 3.9x | 2.9x |
 
 Read that table as a warning as much as a result. Plain monthly buying barely notices the start date. The
 signal presets swing threefold on it, purely from how much cash happened to be on hand when the signal
@@ -67,21 +67,23 @@ says so directly underneath the chart. The nearer horizons are the more informat
 week out of three, a buyer was still behind twelve months later.
 
 **The simplest approach held its own.** Buying the same amount every month and never selling returned 5.1x
-with nothing to decide. In this window the signal presets ended with more and with smaller dips (35% to 50%
-against 73%), but on one to three trades each and with the start-date sensitivity shown above. A $10,000
+with nothing to decide. In this window the signal presets ended with about three times as much and with smaller dips
+(41% to 56% against 73%), but on two sales each and with the start-date sensitivity shown above. A $10,000
 lump sum bought on the 2017 peak itself is worth $44,151.
 
 ## The rule
 
 Monthly savings accumulate as cash and go in when the buy signal appears, so purchases land in the weakest
-stretches rather than being spread evenly.
+stretches rather than being spread evenly. All three presets sell the same way and differ only in how they
+buy.
 
-| Preset | Buy | Sell | Timing |
-|---|---|---|---|
-| **Selective** | RSI < 30 | RSI > 90 and %R > −10 | RSI alone on the buy side, sell same week |
-| **Sequential** | RSI < 30 and %R < −85, staggered | RSI > 88 and %R > −5 | either leg first, the other within 26 weeks |
-| **More active** | RSI < 35 and %R < −70, staggered | RSI > 78 and %R > −5 | looser on both sides |
-| **Failed high** | RSI < 30 | price makes a new high, RSI does not | RSI alone on the buy side, exit below |
+| Preset | Buy | Buying weeks in the window |
+|---|---|---|
+| **Selective** | RSI < 30 | 11 |
+| **Sequential** | RSI < 30 and %R < −85, staggered: either leg first, the other within 26 weeks | 22 |
+| **More active** | RSI < 35 and %R < −70, staggered the same way | 67 |
+
+**Sell (all presets):** the failed high, described below.
 
 ### What "sequential" means
 
@@ -95,16 +97,40 @@ counts equally. An earlier version of this project only accepted RSI-leading, wh
 
 RSI must first run hot (above 80 within the previous 78 weeks). After that, the exit fires when price puts in
 a new peak **above** the previous one while RSI puts in a peak **below** its previous one, with the two peaks
-20 to 40 weeks apart. It lands on the two turns you would want:
+20 to 40 weeks apart.
 
-| Peak identified | Peak price | Sold | Sale price |
-|---|---|---|---|
-| 2021-11-08 | $65,510 | 2021-12-20 | $50,791 |
-| 2025-07-21 | $119,469 | 2025-09-01 | $111,144 |
+| Cycle top (highest weekly close) | Peak the rule spotted | Sold | Sale price | Below the top |
+|---|---|---|---|---|
+| 2021-11-08, $65,510 | 2021-11-08, $65,510 | 2021-12-20 | $50,791 | 22% |
+| 2025-09-29, $123,519 | 2025-07-21, $119,469 | 2025-09-01 | $111,144 | 10% |
 
 **A peak can only be identified after it has passed.** The rule waits six weeks to confirm one, so the sale
-always happens below the top. That lag is the price of the pattern and it is included in every figure here,
-because pretending you could sell on the peak week would be using information that did not exist yet.
+never lands on the top. In 2021 it sold six weeks after it. In 2025 it sold on the July peak's confirmation,
+and the price then made a slightly higher close four weeks later. That lag is the price of the pattern and
+it is included in every figure here, because pretending you could sell on the peak week would be using
+information that did not exist yet.
+
+### Why not a fixed RSI level?
+
+Earlier versions sold when weekly RSI crossed a set level (90, 88 or 78 depending on preset). That could not
+find cycle tops, for two reasons. Weekly RSI peaks during the steepest part of the climb, months before the
+price does, so a low level sells into the rally. And its peaks have been lower each cycle, so a level high
+enough to wait for the top stops firing at all.
+
+Same buys, with only the sale changed (the fixed levels also require %R above −10, as they did before):
+
+| Sell when | Selective | Sequential | More active |
+|---|---|---|---|
+| RSI over 75 | 2.1x | 2.2x | 2.6x |
+| RSI over 80 | 3.4x | 3.5x | 2.7x |
+| RSI over 85 | 5.3x | 5.6x | 4.4x |
+| RSI over 88 | 7.2x | 7.7x | 6.2x |
+| RSI over 90 | 7.3x (one sale, December 2020) | 7.8x | 6.9x |
+| RSI over 95 | never sells | never sells | never sells |
+| **Failed high (shipped)** | **15.6x** | **16.6x** | **13.9x** |
+
+The RSI-over-90 rule sold once, in December 2020 at about $33,000, half the eventual top, and has not fired
+since.
 
 ## Results
 
@@ -112,24 +138,23 @@ because pretending you could sell on the peak week would be using information th
 
 | Preset | Sells | Median hold | Ended with | Multiple | Worst dip | Position now |
 |---|---|---|---|---|---|---|
-| Selective | 1 | 25 mo | $782,984 | 7.3x | 50% | held since 2022-06 |
-| Sequential | 2 | 23 mo | $1,243,590 | 11.6x | **35%** | held since 2026-02 |
-| More active | 3 | 11 mo | $719,964 | 6.7x | 45% | held since 2026-01 |
-| Failed high | 2 | 38 mo | $1,667,315 | **15.6x** | 41% | held since 2026-02 |
+| Selective | 2 | 38 mo | $1,667,315 | 15.6x | **41%** | held since 2026-02 |
+| Sequential | 2 | 38 mo | $1,780,372 | **16.6x** | 42% | held since 2026-02 |
+| More active | 2 | 38 mo | $1,486,037 | 13.9x | 56% | held since 2026-01 |
 | Monthly, never sell | 0 | n/a | $548,998 | 5.1x | 73% | always held |
 
-Every trade under all four lasted months rather than weeks. There is no tidy ordering by trade count here:
-the one-trade and three-trade presets finished close together and the two-trade ones finished ahead. With
-this few trades that says more about where the market tops happened to fall than about the rules.
+All three sell on the same two weeks, so the differences come entirely from buying. Buying in more weeks
+meant a higher average price and, for More active, a deeper dip, because it was already invested before the
+2022 low.
 
 ## Are both indicators actually needed?
 
-Not equally.
+Williams %R now only matters on the buy side, since the exit no longer uses it.
 
-**On the buy side %R never changes which lows are caught.** Weekly RSI closed below 30 in only 11 weeks of
-the window, in three clusters (December 2018, June 2022, February 2026), and Williams %R was below −80
-nearby every time. What %R does is hold the buying window open longer, so more monthly contributions land
-while the price is still low:
+**It never changes which lows are caught.** Weekly RSI closed below 30 in only 11 weeks of the window, in
+three clusters (December 2018, June 2022, February 2026), and Williams %R was below −80 nearby every time.
+What %R does is hold the buying window open longer, so more monthly contributions land while the price is
+still low:
 
 | Window opened | With %R | RSI only |
 |---|---|---|
@@ -137,45 +162,31 @@ while the price is still low:
 | 2022-06-13 | 13 weeks | 5 weeks |
 | 2026-02-02 | 13 weeks | 5 weeks |
 
-**Selective and Failed high buy on RSI alone.** The entry dates are unchanged, so the second condition was
-dropped in favour of a rule that is simpler to state. It costs about a tenth of the return in this window:
-Selective 8.0x → **7.3x**, Failed high 17.3x → **15.6x**.
+**Selective buys on RSI alone.** The entry dates are unchanged, so the second condition was dropped in favour
+of a rule that is simpler to state. It costs about a tenth of the return in this window: 17.3x → **15.6x**.
 
 **Sequential and More active keep it**, because for them it is structural: the `seq` mode is defined as the
 two readings arriving in different weeks, and a staggered sequence needs two legs to stagger. Removing it
-takes Sequential from 11.6x to 10.9x.
+takes Sequential from 16.6x to 15.6x, which is simply the Selective rule.
 
-**On the sell side it binds.** Dropping the %R requirement takes Selective from 7.3x to 6.3x.
+## Does loosening the buy threshold help?
 
-## Does lowering the thresholds help?
+No. Shipped levels in bold.
 
-No. Measured on the presets as shipped, with the shipped level in bold.
+| Buy RSI | Selective | Sequential | More active |
+|---|---|---|---|
+| 20 or 25 | no signals at all | no signals at all | no signals at all |
+| 30 | **15.6x** | **16.6x** | 17.5x |
+| 35 | 13.7x | 13.7x | **13.9x** |
+| 40 | 8.5x | 9.2x | 8.5x |
 
-| Buy RSI | Selective | Sequential |
-|---|---|---|
-| 20 or 25 | no signals at all | no signals at all |
-| **30** | **7.3x** | **11.6x** |
-| 35 | 6.8x | 9.6x |
-| 40 | 5.2x | 6.5x |
+More active would have returned more at 30 than at its shipped 35. It is left where it is because it exists
+to show the looser end of the trade-off, not to maximise a number.
 
-| Sell RSI | Selective | Sequential |
-|---|---|---|
-| 75 | 2.1x | 2.2x |
-| 80 | 3.4x | 6.7x |
-| 85 | 5.3x | 9.4x |
-| 88 | 7.2x | **11.6x** |
-| **90** | **7.3x** | never sells |
-| 92 | 7.3x | never sells |
-| 95 | never sells | never sells |
-
-Each preset carries its own %R sell level, so the two columns are not directly comparable; only the RSI
-level changes down each one. Selling early is the expensive mistake: at 75 both presets give up most of
-their return. Above 88 the sell side becomes fragile instead, because weekly RSI has rarely reached those
-levels since 2017, and a rule that never fires is just holding.
-
-These thresholds were chosen on the full history from 2012, where 163,840 combinations were searched. The
-best cell there was a spike rather than a plateau, with only 19% of its neighbours reaching half its return,
-which is the signature of a result fitted to one particular history. Nothing was retuned for this window.
+The buy thresholds and the failed-high settings were chosen on the full history from 2012, where 163,840
+combinations of the older fixed-level rules were searched. The best cell there was a spike rather than a
+plateau, which is the signature of a result fitted to one particular history. Nothing was retuned for this
+window.
 
 ## Do the two indicators peak together?
 
@@ -193,11 +204,13 @@ rule still finds anything at all, but the onsets are clearly staggered.
 
 ## Reading it fairly
 
-- One to three completed trades depending on preset. That is a very small sample, and small samples flatter
-  backtests.
+- Two completed trades per preset, on the same two sale dates. That is a very small sample, and small
+  samples flatter backtests.
+- The failed-high exit was adopted because fixed RSI levels missed these two tops. It fits them by
+  construction, which says nothing about whether it will find the next one.
 - The window was chosen after seeing the data, and the start date moves the signal results threefold. The
   monthly-buying and holding-period figures are the ones that depend on it least.
-- The thresholds were fitted on the longer history that includes this window, so this is not an
+- The thresholds and failed-high settings were fitted on the longer history that includes this window, so this is not an
   out-of-sample test.
 - The lead and lag finding rests on five matched pairs. It is suggestive, not established.
 - Long gaps between signals mean cash can sit uninvested for years, which is difficult to stick with.

@@ -68,13 +68,19 @@ export const CFG = {
   // failed-high exit
   fhPivot: 6, fhRefRsi: 65, fhMinGap: 20, fhMaxGap: 40, fhArm: 80, fhArmWin: 78,
   monthly: 1000,
+  // First week included in the backtest and statistics: the week of the Dec 2017
+  // top. The page then covers the two most recent cycles including the 2018 bear
+  // market, and savings have a year to build before the first buy signal. Starting
+  // on the Dec 2018 low itself meant entering the best buy of the period with one
+  // month of savings, which understated every signal preset by roughly 3x.
+  from: '2017-12-11',
 };
 
 // Three presets sitting at different points on the same trade-off:
 // fewer, larger trades at one end and more, smaller ones at the other.
 export const PRESETS = [
   { id: 'selective', label: 'Selective',
-    blurb: 'Waits for the most extreme readings. Fewest trades, largest gains, deepest dips.',
+    blurb: 'Waits for the most extreme readings. Fewest trades, and long stretches spent in cash between them.',
     cfg: { buyRsi: 30, buyWpr: null,
            sellRsi: 90, sellWpr: -10, sellOrder: 'sim', sellWin: 8 } },
   { id: 'sequential', label: 'Sequential',
@@ -82,11 +88,11 @@ export const PRESETS = [
     cfg: { buyRsi: 30, buyWpr: -85, buyOrder: 'seq', buyWin: 26,
            sellRsi: 88, sellWpr: -5, sellOrder: 'sim', sellWin: 8 } },
   { id: 'active', label: 'More active',
-    blurb: 'Looser thresholds on both sides. More trades, still months long, noticeably smaller returns.',
+    blurb: 'Looser thresholds on both sides. More trades, each still months long.',
     cfg: { buyRsi: 35, buyWpr: -70, buyOrder: 'seq', buyWin: 26,
            sellRsi: 78, sellWpr: -5, sellOrder: 'either', sellWin: 4 } },
   { id: 'failedhigh', label: 'Failed high',
-    blurb: 'Exits when price makes a new high but RSI does not, having been overheated beforehand. Three completed trades, and the only preset that has closed the 2022 position.',
+    blurb: 'Exits when price makes a new high but RSI does not, having been overheated beforehand. Closes the position after each cycle top rather than on it, and the only preset that has closed the 2022 position.',
     cfg: { buyRsi: 30, buyWpr: null,
            sellMode: 'failedHigh',
            fhPivot: 6, fhRefRsi: 65, fhMinGap: 20, fhMaxGap: 40, fhArm: 80, fhArmWin: 78 } },
@@ -185,8 +191,26 @@ export function computeWeekly(daily, cfg = {}) {
     sellSignal = combine(rsiHigh, wprHigh, o.sellOrder, o.sellWin);
   }
 
-  return { cfg: o, W, C, H, L, rsi: r, wpr: pr, wma: wm,
-           rsiLow, wprLow, rsiHigh, wprHigh, buySignal, sellSignal, sellMeta };
+  const S = { cfg: o, W, C, H, L, rsi: r, wpr: pr, wma: wm,
+              rsiLow, wprLow, rsiHigh, wprHigh, buySignal, sellSignal, sellMeta };
+  return o.from ? trimTo(S, o.from) : S;
+}
+
+// Indicators and signals are computed on the full history so RSI and the 2 year
+// average are warmed up, and a signal can see the lows that preceded the window.
+// Only afterwards is everything cut to start at `from`, so the simulation and
+// every statistic downstream see just the chosen window.
+function trimTo(S, from) {
+  const s = S.W.findIndex(w => w.date >= from);
+  if (s <= 0) return S;
+  const cut = a => a.slice(s);
+  const meta = new Map();
+  for (const [k, v] of S.sellMeta) if (k >= s) meta.set(k - s, v);
+  return { ...S, W: cut(S.W), C: cut(S.C), H: cut(S.H), L: cut(S.L),
+           rsi: cut(S.rsi), wpr: cut(S.wpr), wma: cut(S.wma),
+           rsiLow: cut(S.rsiLow), wprLow: cut(S.wprLow),
+           rsiHigh: cut(S.rsiHigh), wprHigh: cut(S.wprHigh),
+           buySignal: cut(S.buySignal), sellSignal: cut(S.sellSignal), sellMeta: meta };
 }
 
 // Collapse a run of true bars into episodes separated by at least `gap` weeks.

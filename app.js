@@ -286,7 +286,7 @@ function renderHeadline() {
     <div class="hstat">
       <div class="n">${up} of ${eps.length}</div>
       <div class="t">buying signals were followed by a higher price</div>
-      <div class="s">Every one so far, including the one currently active. They have appeared roughly once
+      <div class="s">${up === eps.length ? 'Every one so far, including any that is currently active.' : 'Not every one, so this is a tendency rather than a rule.'} They have appeared roughly once
         every three and a half years.</div>
     </div>`;
 }
@@ -294,6 +294,7 @@ function renderHeadline() {
 function renderOdds() {
   const S = computeWeekly(DAILY, PRESETS[0].cfg);
   const rows = [1, 2, 3, 4].map(y => holdingOdds(S, y)).filter(r => r.n > 50);
+  const yrs = ((S.W[S.W.length - 1].t - S.W[0].t) / (365.25 * 86400000)).toFixed(0);
   $('odds').innerHTML = rows.map(r => `
     <div class="bar" role="img"
          aria-label="Held for ${r.years} year${r.years > 1 ? 's' : ''}: the price was higher afterwards in ${r.pct.toFixed(0)} percent of cases, from ${r.n.toLocaleString()} weeks.">
@@ -304,7 +305,8 @@ function renderOdds() {
   const one = rows[0], three = rows.find(r => r.years === 3);
   $('oddsnote').innerHTML = `
     <strong>Read the four year figure carefully.</strong> It is drawn from a single asset over a single
-    fourteen year run in which the price rose from a few dollars to tens of thousands. Any asset with that
+    run of about ${yrs} years that starts at the December 2017 peak. Over it the price went from
+    ${usd(S.C[0])} to ${usd(S.C[S.C.length - 1])}. Any asset with that
     shape produces a number close to 100% at long horizons, so this describes what happened rather than
     what must happen, and it is not a promise about any four years to come.
     The nearer horizons are the more informative ones: holding for a single year still meant losing money in
@@ -328,21 +330,31 @@ function renderSimple() {
         <tr class="${i === 0 ? 'hl' : ''}">
           <td><strong>${x.tagline}</strong></td>
           <td class="num">${usd(x.final)}</td>
-          <td class="num">${x.multiple.toFixed(0)}x</td>
+          <td class="num">${x.multiple.toFixed(1)}x</td>
           <td class="num dim">${x.maxDD.toFixed(0)}%</td>
         </tr>`).join('')}
       </tbody>
     </table>
-    <div class="note">Buying every month came out ahead, and it is also the easiest to stick with, because
+    <div class="note">${simple.final >= signal.final
+      ? `Buying every month came out ahead, and it is also the easiest to stick with, because
       there is nothing to decide each week. The signals in the rest of this page are worth understanding, but
-      the record does not say you need them. A single ${usd(10000)} lump sum left alone from the start would
-      have become ${usd(lump.final)}, though one early payment compounds for much longer than money added
-      gradually, so that figure is not comparable to the others.</div>`;
+      the record does not say you need them.`
+      : `Waiting for the signal ended with more in this window, and with a smaller worst dip. Its result
+      depends heavily on how much had been saved up when the signal arrived, though, and it rests on a
+      handful of trades. Buying every month landed in much the same place whenever it was started, and it
+      is the easiest to stick with, because there is nothing to decide each week.`} A single ${usd(10000)} lump sum left alone from the start would
+      have become ${usd(lump.final)}, and this window opens on the December 2017 peak, so that is the
+      result of buying at the worst possible moment and waiting.</div>`;
 }
 
 /* ---------------- lead and lag ---------------- */
 function renderLeadLag() {
-  const S = computeWeekly(DAILY, PRESETS[0].cfg);
+  // The Selective preset buys on RSI alone, which leaves no %R lows to pair up,
+  // so the comparison always uses the -80 level described in the rule section.
+  // It also runs on the full history rather than the backtest window: this is a
+  // property of the indicators, there are too few extremes in two cycles to show
+  // it, and an episode already under way at the window edge would be misdated.
+  const S = computeWeekly(DAILY, { ...PRESETS[0].cfg, buyWpr: -80, from: null });
   const top = leadLag(S, 'top'), bot = leadLag(S, 'bottom');
 
   const tbl = (t, title) => `
@@ -363,7 +375,10 @@ function renderLeadLag() {
   $('leadlagnote').innerHTML = `
     <strong>They never arrive in the same week.</strong> Across every pair above, the two indicators reached
     their extremes weeks or months apart, not together. At tops Williams %R got there first every time,
-    on average ${Math.abs(top.mean).toFixed(0)} weeks ahead of RSI. At bottoms the order was mixed.
+    on average ${Math.abs(top.mean).toFixed(0)} weeks ahead of RSI. At bottoms ${
+      bot.rsiFirst && bot.wprFirst ? 'the order was mixed'
+      : bot.wprFirst ? 'Williams %R also led' : bot.rsiFirst ? 'RSI led' : 'they landed together'}.
+    This one comparison uses the full history back to ${S.W[0].date.slice(0, 4)}, because two cycles hold too few extremes to show it.
     The runs do overlap later, which is why a same-week rule still finds something, but the onset is
     clearly staggered.`;
 }
@@ -392,8 +407,8 @@ function renderPresetTable() {
     </table>
     <p class="sm dim">Every trade under all of these lasted months rather than weeks, the shortest
        being ${Math.min(...rows.map(x => x.min)).toFixed(0)} months. The pattern is
-       consistent: loosening the thresholds to get more signals reduced the return each time, though it also
-       reduced the worst dip.</p>`;
+       that more trades did not reliably mean more return: results moved around with the window and the
+       thresholds rather than rising or falling in a line.</p>`;
 }
 
 function median(a) {

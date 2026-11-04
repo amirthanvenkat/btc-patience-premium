@@ -15,6 +15,66 @@ against the code.
 
 ---
 
+## Why this exists
+
+### The problem
+
+People who are new to Bitcoin tend to ask the same few questions. Is it too late? Should I wait for a dip?
+What if it crashes right after I buy? The answers they find are mostly hype from one side or fear from the
+other, and very few of them show what the price record actually says. So people end up in one of two places:
+frozen, waiting for a perfect moment that never feels right, or buying near a peak and selling in the next
+fall.
+
+This page is the answer I wanted to be able to hand them: one link, plain English, every number checkable.
+
+### What a reader should take away
+
+1. **A steady monthly habit is a reasonable place to start.** Buying the same amount every month, with
+   nothing to decide, held its own against every rule tested here. Waiting for the perfect week is not a
+   requirement.
+2. **Deep falls are part of the record.** A monthly saver since the 2017 peak was down more than 70% at the
+   worst point. Seeing that in advance, along with the recoveries that followed, makes it easier not to sell
+   in the middle of one. Past recoveries are history, not a promise.
+3. **The genuinely rare moments are recognisable.** A handful of weeks stood out at the bottoms and the tops
+   of each cycle. Knowing what they looked like is useful whether or not you ever act on them.
+
+### Why weekly RSI and Williams %R
+
+- **They are what I use.** Both are on my own TradingView chart, so the page tests a real process rather
+  than one invented for the write-up.
+- **They can be explained in one sentence each.** RSI scores how hard the price has been pushed lately, from
+  0 to 100. Williams %R says where this week's price sits in its recent range. A reader with no background
+  can follow both, which is not true of most on-chain measures.
+- **They need nothing but the price.** That keeps the page free, static and fully reproducible: it fetches
+  public price data and computes everything in the browser, with no API keys, no paid data and no server.
+- **Weekly, not daily.** Daily readings flip constantly, and the moments that mattered in this history played
+  out over months. Weekly bars keep the signals rare enough to mean something.
+
+Other measures were considered and left out on those grounds rather than on results. Moving-average and MACD
+crossovers are common, but they are harder to explain as "extreme" readings. On-chain valuation measures such
+as MVRV are popular for spotting cycle tops, but they need data sources that are not free and keyless, and
+they take a paragraph to explain rather than a sentence.
+
+### Why these thresholds
+
+- **Buy on RSI below 30.** It is the standard "oversold" line, and on a weekly chart it is rare: it was hit
+  in only three clusters since 2017 (December 2018, June 2022, February 2026), each near a cycle low. Tighter
+  levels (20 or 25) never fired at all; looser ones bought earlier in the fall at higher prices.
+- **Sell on a failed high, not a fixed RSI level.** Fixed sell levels were tried first and could not find
+  cycle tops, because weekly RSI peaks months before the price and has peaked lower each cycle. The failed
+  high waits for the price to make a new peak that RSI does not match, which sold 22% and 10% below the last
+  two tops.
+- **Three presets, not one.** They show the same idea at different levels of pickiness, so a reader can see
+  the trade-off for themselves instead of taking one number on trust.
+
+The levels were chosen on the longer history back to 2012 and were not retuned for the current window. The
+"Reading it fairly" section below covers what that does and does not prove.
+
+### What it is not
+
+Not a trading bot, not a signal service and not a forecast. It describes what happened, as plainly as
+possible, so a newcomer can make their own decisions with the record in front of them.
+
 ## The window: December 2017 to today
 
 Every result on the page is measured from the week of the **December 2017 peak** (2017-12-11) onward.

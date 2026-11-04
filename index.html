@@ -154,6 +154,8 @@
 
   .rulegrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   @media (max-width:620px){ .rulegrid{grid-template-columns:1fr} }
+  .why .rulegrid{grid-template-columns:repeat(3,1fr)}
+  @media (max-width:860px){ .why .rulegrid{grid-template-columns:1fr} }
   .rule{background:var(--card2);border-radius:11px;padding:16px}
   .rule h4{margin:0 0 8px;font-size:.98rem}
   .cond{display:flex;align-items:center;gap:8px;font-size:.9rem;padding:5px 0}
@@ -191,6 +193,33 @@
      assumes prior knowledge, and every number is calculated in your own browser from public data so you can
      check it.</p>
 </header>
+
+<section class="why">
+  <h2>Why this page exists</h2>
+  <div class="card">
+    <div class="rulegrid">
+      <div class="rule">
+        <h4>The problem</h4>
+        <p class="sm" style="margin:6px 0 0">People new to Bitcoin ask the same things: is it too late, should
+           I wait for a dip, what if it crashes? Most answers are hype or fear, and few show the actual record.
+           So people freeze waiting for a perfect moment, or buy near a peak and sell in the next fall.</p>
+      </div>
+      <div class="rule">
+        <h4>Why these two signals</h4>
+        <p class="sm" style="margin:6px 0 0">Weekly RSI and Williams %R are what I watch on my own chart, each
+           takes one sentence to explain, and both need only the price, so everything here is computed in
+           your browser from free public data. Weekly, because the moments that mattered played out over
+           months, not days.</p>
+      </div>
+      <div class="rule">
+        <h4>What you should leave with</h4>
+        <p class="sm" style="margin:6px 0 0">That a steady monthly habit is a reasonable place to start, with
+           no perfect week required. That falls of 70% or more are part of the record, so one is less of a
+           shock. And what the rare extreme moments at bottoms and tops have looked like.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <div id="loading" class="card"><span id="loadmsg">Loading price history</span></div>
 

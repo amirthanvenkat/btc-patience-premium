@@ -1,5 +1,6 @@
 import { loadDaily } from './data.js';
-import { computeWeekly, runAll, buyEpisodes, buyHold, thresholdSweep, leadLag, PRESETS } from './engine.js';
+import { computeWeekly, runAll, buyEpisodes, buyHold, thresholdSweep, leadLag, priceLevel, closeForRsi,
+         PRESETS } from './engine.js';
 import { priceChart, equityChart } from './chart.js';
 
 const $ = id => document.getElementById(id);
@@ -49,10 +50,20 @@ function buildPresetButtons() {
     `<button data-id="${p.id}" class="${p.id === CURRENT ? 'on' : ''}">${p.label}</button>`).join('');
   $('presets').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
-    CURRENT = b.dataset.id;
-    [...$('presets').children].forEach(c => c.classList.toggle('on', c === b));
-    apply(PRESETS.find(p => p.id === CURRENT));
+    select(b.dataset.id);
   });
+  // The strip in the "today" card switches preset too, so both controls go
+  // through one function and stay in step.
+  $('strip').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (b) select(b.dataset.id);
+  });
+}
+
+function select(id) {
+  if (id === CURRENT) return;
+  CURRENT = id;
+  [...$('presets').children].forEach(c => c.classList.toggle('on', c.dataset.id === id));
+  apply(PRESETS.find(p => p.id === id));
 }
 
 function apply(preset) {
@@ -68,12 +79,92 @@ function apply(preset) {
 }
 
 /* ---------------- live state ---------------- */
+const DAY_MS = 86400000;
+const utc = d => new Date(d + 'T00:00:00Z');
+const monYear = d => utc(d).toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const dayMon = d => utc(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const near = n => '$' + (Math.round(n / 100) * 100).toLocaleString('en-US');
+
+// The most recent stretch of weeks in which the buy signal was on, before `i`.
+function lastBuyRun(S, i) {
+  let e = i;
+  while (e >= 0 && !S.buySignal[e]) e--;
+  if (e < 0) return null;
+  let s = e;
+  while (s > 0 && S.buySignal[s - 1]) s--;
+  let lo = Infinity, hi = -Infinity;
+  for (let k = s; k <= e; k++) { lo = Math.min(lo, S.C[k]); hi = Math.max(hi, S.C[k]); }
+  return { from: S.W[s].date, to: S.W[e].date, weeks: e - s + 1, lo, hi };
+}
+
+// Where today's price sits against the prices of the last signal.
+function againstRun(px, run) {
+  const below = v => Math.round((1 - px / v) * 100), above = v => Math.round((px / v - 1) * 100);
+  const range = (a, b) => a === b ? `${a}%` : `${Math.min(a, b)}% to ${Math.max(a, b)}%`;
+  if (px < run.lo) return `Today's price is ${range(below(run.lo), below(run.hi))} below ${run.weeks > 1 ? 'that range' : 'that'}.`;
+  if (px > run.hi) return `Today's price is ${range(above(run.lo), above(run.hi))} above ${run.weeks > 1 ? 'that range' : 'that'}.`;
+  return `Today's price is inside that range.`;
+}
+
+function renderLevel(S) {
+  const L = priceLevel(S);
+  const stat = (label, val, sub) => `
+    <div class="stat">
+      <span class="k">${label}</span><span class="v">${val}</span><span class="d">${sub}</span>
+    </div>`;
+  const fall = Math.round(-L.fall);
+  const off = L.vsAvg === null ? null : Math.round(Math.abs(L.vsAvg));
+
+  let record = '';
+  if (L.side && L.yearOn.n) {
+    record = `The price has been ${L.side} its 2 year average in ${L.sameSide} of the last ${L.counted} weeks.
+      A year after those weeks it was higher ${Math.round(L.yearOn.up / L.yearOn.n * 100)}% of the time.`;
+  }
+  if (L.falls.length) {
+    const f = L.falls.map(x => Math.round(-x.further)).sort((a, b) => a - b);
+    const times = L.falls.length === 1 ? 'once' : L.falls.length === 2 ? 'twice' : `${L.falls.length} times`;
+    const top = f[f.length - 1];
+    const span = f[0] === top ? `was ${top}%`
+               : f[0] < 1 ? `ranged from almost nothing to ${top}%`
+               : `ranged from ${f[0]}% to ${top}%`;
+    record += ` It has also been this far below a high ${times} before in this period. The further fall from
+      that point to the low ${span}.`;
+  }
+
+  $('level').innerHTML = `
+    <div class="stats two">
+      ${stat('Against its high', fall < 1 ? 'At a high' : `${fall}% below`,
+             `${usd(L.high)} in ${monYear(L.highDate)}`)}
+      ${off === null ? '' : stat('Against its 2 year average', off < 1 ? 'Level' : `${off}% ${L.side}`,
+             `The average is ${usd(L.avg)}`)}
+    </div>
+    ${record ? `<p class="sm dim levelnote">${record} This describes where the price sits. It is not a signal,
+       and no result on this page depends on it.</p>` : ''}`;
+}
+
+function renderStrip() {
+  $('strip').innerHTML = PRESETS.map(p => {
+    const S = computeWeekly(DAILY, p.cfg), i = S.W.length - 1;
+    const st = S.sellSignal[i] ? ['v-sell', 'Sell conditions met']
+             : S.buySignal[i] ? ['v-buy', 'Buy conditions met'] : ['v-hold', 'No signal'];
+    return `<button data-id="${p.id}" class="${st[0]}${p.id === CURRENT ? ' on' : ''}"
+                    aria-pressed="${p.id === CURRENT}">
+              <span class="k">${p.label}</span><span class="s">${st[1]}</span>
+            </button>`;
+  }).join('');
+}
+
 function renderNow(S) {
   const i = S.W.length - 1, c = S.cfg;
   const r = S.rsi[i], pr = S.wpr[i];
+  const open = S.W[i].t + 6 * DAY_MS > DAILY[DAILY.length - 1].t;
   $('price').textContent = usd(S.C[i]);
-  $('week').textContent = `week of ${S.W[i].date}`;
+  $('week').textContent = `week of ${dayMon(S.W[i].date)}` + (open ? ', still in progress' : '');
   $('source').textContent = SOURCE;
+  $('signame').textContent = PRESETS.find(p => p.id === CURRENT).label;
+
+  renderLevel(S);
+  renderStrip();
 
   const leg = (on, label, val, want) => `
     <div class="stat ${on ? 'on' : ''}">
@@ -85,11 +176,15 @@ function renderNow(S) {
     : o === 'seq' ? `Either one first, the other following within ${win} weeks`
     : `Both within ${win} weeks, either order`;
 
+  // How far the RSI leg is from being met, as a price a reader can picture.
+  const need = S.rsiLow[i] || r === null ? null : closeForRsi(S.C, c.buyRsi, c.rsiLen);
+  const rsiWant = `Under ${c.buyRsi}` + (need ? `. A close near ${near(need)} this week would do it` : '');
+
   $('buylegs').innerHTML = c.buyWpr === null
-    ? leg(S.rsiLow[i], 'Weekly RSI', r === null ? 'n/a' : r.toFixed(1), `Under ${c.buyRsi}`) +
+    ? leg(S.rsiLow[i], 'Weekly RSI', r === null ? 'n/a' : r.toFixed(1), rsiWant) +
       `<p class="sm dim" style="margin:2px 0 0">This preset buys on RSI alone. Williams %R never changed
          which lows were caught, so it was dropped here.</p>`
-    : leg(S.rsiLow[i], 'Weekly RSI', r === null ? 'n/a' : r.toFixed(1), `Under ${c.buyRsi}`) +
+    : leg(S.rsiLow[i], 'Weekly RSI', r === null ? 'n/a' : r.toFixed(1), rsiWant) +
       leg(S.wprLow[i], 'Williams %R', pr === null ? 'n/a' : pr.toFixed(1), `Under ${c.buyWpr}`) +
       `<p class="sm dim" style="margin:2px 0 0">${orderText(c.buyOrder, c.buyWin)}</p>`;
 
@@ -113,12 +208,24 @@ function renderNow(S) {
 
   const buyOn = S.buySignal[i], sellOn = S.sellSignal[i];
   $('verdict').className = 'verdict ' + (sellOn ? 'v-sell' : buyOn ? 'v-buy' : 'v-hold');
-  $('verdict').innerHTML = sellOn
-    ? `<strong>Sell conditions met.</strong> Both readings satisfy this preset's exit rule.`
-    : buyOn
-      ? `<strong>Buy conditions met.</strong> Both readings satisfy this preset's entry rule.`
-      : `<strong>Neither set of conditions is met.</strong> The rule holds what it owns and lets new savings
-         build until the next buy signal.`;
+  if (sellOn) {
+    $('verdict').innerHTML = `<strong>Sell conditions met.</strong> This preset's exit rule is satisfied this week.`;
+  } else if (buyOn) {
+    $('verdict').innerHTML = `<strong>Buy conditions met.</strong> This preset's entry rule is satisfied this week.`;
+  } else {
+    // A quiet week is the normal state, so say what the rule last did and where
+    // the price is against it. A signal follows momentum, not price level, which
+    // is why it can be silent below the price it last fired at.
+    const run = lastBuyRun(S, i);
+    const last = !run ? '' : run.weeks > 1
+      ? ` Its last buy signal ran from ${dayMon(run.from)} to ${dayMon(run.to)}, at ${usd(run.lo)} to ${usd(run.hi)}.`
+      : ` Its last buy signal was the week of ${dayMon(run.from)}, at ${usd(run.lo)}.`;
+    const why = run && S.C[i] < run.lo
+      ? ` The signal follows how fast the price is falling, not how low it is, so it can stay quiet at a lower price.`
+      : '';
+    $('verdict').innerHTML = `<strong>No new signal this week.</strong>${last}${run ? ' ' + againstRun(S.C[i], run) : ''}${why}
+      The rule holds what it owns and lets new savings build until the next buy signal.`;
+  }
 }
 
 function renderChart(S) {

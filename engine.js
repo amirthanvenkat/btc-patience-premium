@@ -326,6 +326,76 @@ export function thresholdSweep(S, levels = [81, 85, 88, 90, 92]) {
   });
 }
 
+// Where the price sits against its own history. This is a description, not a
+// rule: nothing here feeds a buy or sell signal or any simulated result. It
+// exists because a timing signal measures momentum, so it can stay silent at a
+// price lower than the one it last fired at, and the page should be able to say
+// where the price is as well as whether a signal is on.
+export function priceLevel(S) {
+  const { W, C, H, wma } = S, n = C.length, i = n - 1;
+  const runHigh = [], highAt = [];
+  let m = -Infinity, mi = 0;
+  for (let k = 0; k < n; k++) {
+    if (H[k] > m) { m = H[k]; mi = k; }
+    runHigh.push(m); highAt.push(mi);
+  }
+  const dd = C.map((c, k) => c / runHigh[k] - 1);
+
+  const side = k => wma[k] === null ? null : C[k] < wma[k] ? 'below' : 'above';
+  const now = side(i);
+  let counted = 0, sameSide = 0, n1 = 0, up1 = 0;
+  for (let k = 0; k < n; k++) {
+    const s = side(k);
+    if (s === null) continue;
+    counted++;
+    if (s !== now) continue;
+    sameSide++;
+    if (k + 52 < n) { n1++; if (C[k + 52] > C[k]) up1++; }
+  }
+
+  // Earlier times the price fell this far below a high: for each one, how much
+  // further it went before the low. Shown beside the favourable odds so the
+  // level reading is never one-sided. Skipped when the price is near its high,
+  // where "this far" would match almost every week on record.
+  const falls = [];
+  if (dd[i] <= -0.10) {
+    let k = 0;
+    while (k < n) {
+      const g = highAt[k];
+      let e = k;
+      while (e + 1 < n && highAt[e + 1] === g) e++;
+      if (g !== highAt[i]) {
+        let first = -1;
+        for (let j = k; j <= e; j++) if (dd[j] <= dd[i]) { first = j; break; }
+        if (first >= 0) {
+          let lo = first;
+          for (let j = first; j <= e; j++) if (C[j] < C[lo]) lo = j;
+          falls.push({ highDate: W[g].date, firstDate: W[first].date, lowDate: W[lo].date,
+                       further: (C[lo] / C[first] - 1) * 100 });
+        }
+      }
+      k = e + 1;
+    }
+  }
+
+  return {
+    price: C[i], high: runHigh[i], highDate: W[highAt[i]].date, fall: dd[i] * 100,
+    avg: wma[i], vsAvg: wma[i] === null ? null : (C[i] / wma[i] - 1) * 100,
+    side: now, sameSide, counted, yearOn: { n: n1, up: up1 }, falls,
+  };
+}
+
+// The weekly close that would put RSI at `target` if the current week ended
+// there. RSI rises with the last close, so a bisection finds it.
+export function closeForRsi(C, target, len = 14) {
+  const i = C.length - 1, c2 = C.slice();
+  const at = px => { c2[i] = px; return rsi(c2, len)[i]; };
+  let lo = C[i] * 0.05, hi = C[i] * 5;
+  if (at(lo) > target || at(hi) < target) return null;
+  for (let z = 0; z < 60; z++) { const mid = (lo + hi) / 2; if (at(mid) < target) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+}
+
 // Contiguous stretches where the buy signal was active.
 export function buyEpisodes(S) {
   const { W, C, buySignal } = S;

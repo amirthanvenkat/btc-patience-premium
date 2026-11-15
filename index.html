@@ -76,6 +76,25 @@
   .stat .v{font-size:1.3rem;font-weight:650;letter-spacing:-.02em;text-align:right;font-variant-numeric:tabular-nums}
   .stat .d{grid-column:1/-1;color:var(--dim);font-size:.79rem}
 
+  .stats.two{grid-template-columns:1fr 1fr}
+  @media (max-width:620px){ .stats.two{grid-template-columns:1fr} }
+  .levelnote{margin:10px 0 0;max-width:78ch;line-height:1.55}
+  .cardh{margin-top:26px}
+  .strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media (max-width:620px){ .strip{grid-template-columns:1fr} }
+  .strip button{background:var(--card2);color:var(--tx);border:1px solid transparent;border-left:3px solid var(--dim);
+    border-radius:11px;padding:10px 14px;text-align:left;cursor:pointer;font:inherit;display:grid;gap:2px}
+  .strip button:hover{border-color:var(--accent);border-left-color:var(--accent)}
+  .strip button.v-buy{border-left-color:var(--buy)}
+  .strip button.v-sell{border-left-color:var(--sell)}
+  .strip button.on{border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
+  .strip button.on.v-buy{border-left-color:var(--buy)}
+  .strip button.on.v-sell{border-left-color:var(--sell)}
+  .strip .k{color:var(--dim);font-size:.8rem;font-weight:600}
+  .strip .s{font-size:.98rem;font-weight:650}
+  .stripnote{margin:10px 0 16px}
+  .stripnote strong{color:var(--tx)}
+
   .verdict{margin-top:18px;padding:13px 16px;border-radius:11px;font-size:.95rem;
     background:var(--card2);border-left:3px solid var(--dim)}
   .verdict.v-buy{border-left-color:var(--buy)}
@@ -250,13 +269,19 @@
 
   <section>
     <h2>Where Bitcoin is today</h2>
-    <p class="sectionsub">The signals below are one way of spotting unusually cheap and unusually stretched
-       moments. They are a lens on the market, not instructions.</p>
+    <p class="sectionsub">Two separate readings. The first is where the price sits against its own history.
+       The second is whether a timing signal is on this week. They can disagree, because a signal follows
+       momentum and not price level. Both are a lens on the market, not instructions.</p>
     <div class="card">
       <div class="hero">
         <div class="big" id="price"></div>
         <div class="week" id="week"></div>
       </div>
+      <h3>Price level</h3>
+      <div id="level"></div>
+      <h3 class="cardh">Timing signal this week</h3>
+      <div class="strip" id="strip" role="group" aria-label="This week's signal for each preset"></div>
+      <p class="sm dim stripnote">Showing the conditions for <strong id="signame"></strong>. Choose another to see its conditions.</p>
       <div class="legs">
         <div><h3>Buy conditions</h3><div class="stats" id="buylegs"></div></div>
         <div><h3>Sell conditions</h3><div class="stats" id="selllegs"></div></div>

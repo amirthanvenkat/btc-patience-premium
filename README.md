@@ -192,6 +192,63 @@ Same buys, with only the sale changed (the fixed levels also require %R above âˆ
 The RSI-over-90 rule sold once, in December 2020 at about $33,000, half the eventual top, and has not fired
 since.
 
+## Where Bitcoin is today: level and timing
+
+The card near the top of the page is the only part that changes every week, and it answers two separate
+questions.
+
+**Price level** is where the price sits against its own history: how far it is below its high, and how far
+above or below its 2 year average (a 100 week weighted average, the same line drawn on the chart).
+
+**Timing signal** is whether a preset's buy or sell rule is on this week.
+
+### Why they are shown separately
+
+The two can disagree, and a reader should be able to see that at a glance. RSI measures how fast the price
+has been moving, not how low it is. So a signal can fire during a sharp fall and then stay silent months
+later at a lower price, because the second fall was slower.
+
+That is what prompted this design. In the week of 2026-11-09, with Bitcoin at $64,114:
+
+| Reading | Value |
+|---|---|
+| Below the high ($126,272, October 2025) | 49% |
+| Below the 2 year average ($82,431) | 22% |
+| Weekly RSI | 37.7 (Selective needs under 30) |
+| Selective's last buy signal | 2026-02-02 to 2026-03-02, at $65,771 to $70,283 |
+| Selective this week | No signal |
+| More active this week | Buy conditions met |
+
+The earlier card showed one preset and said "neither set of conditions is met". That was correct and
+unhelpful: the price was below the level at which the same rule had last bought, another preset was showing
+a buy, and nothing on the card said either. I considered loosening the buy rule so the card would agree with
+how the price looked, and decided against it. Changing a rule because the author thinks the price is good is
+fitting to an opinion, and the threshold table below already shows that looser buying did worse. The rules
+were left alone and the card was changed to explain itself.
+
+### What the card shows
+
+- **Two level readings**, each stated as a position ("49% below"), never as a judgement such as "cheap".
+- **The record at that level, in both directions.** How often the price has been on this side of its 2 year
+  average, how often it was higher a year later, and how much further it fell on the earlier occasions it
+  was this far below a high. In the snapshot week: below the average in 170 of 466 weeks, higher a year
+  later 85% of the time, and three earlier falls of this size that went on to lose a further 0%, 52% and
+  61% before the low (2021, 2022 and 2018). The favourable figure is never shown without the other.
+- **All three presets' verdicts in one strip**, which also switches the page between presets.
+- **Distance to a signal.** The RSI condition states the weekly close that would meet it, for example
+  "a close near $51,300 this week would do it".
+- **A quiet week explained.** When no signal is on, the verdict gives the last buy signal's dates and price
+  range and says where today's price is against it.
+- **An in-progress marker** on the current week, because the readings can change before the weekly close.
+
+### What the level reading is not
+
+It is a description, not a fourth strategy. It has no backtest, produces no multiple, and feeds no buy or
+sell rule; the preset results are identical with and without it. The "higher a year later" figure counts
+overlapping weeks from two cycles, so it describes this record and predicts nothing. Being below the average
+is also common, about a third of all weeks, and in 2018 and 2022 the price more than halved again from a
+fall of this size.
+
 ## Results
 
 461 weeks, 2017-12-11 to 2026-10-05, paying in $1,000 a month ($107,000 in total).
@@ -273,6 +330,8 @@ rule still finds anything at all, but the onsets are clearly staggered.
 - The thresholds and failed-high settings were fitted on the longer history that includes this window, so this is not an
   out-of-sample test.
 - The lead and lag finding rests on five matched pairs. It is suggestive, not established.
+- The price-level reading on the today card is untested as a rule and should not be read as one. The 2 year
+  average is one yardstick among many, chosen because it is already on the chart.
 - Long gaps between signals mean cash can sit uninvested for years, which is difficult to stick with.
 - Trading costs, spreads and tax are excluded and reduce real world results.
 
@@ -293,7 +352,7 @@ aggregated into Monday-start weeks and the in-progress day is dropped. The serie
 | File | Purpose |
 |---|---|
 | `index.html` | Structure, styling, glossary and written explanation |
-| `engine.js` | RSI, Williams %R, WMA, weekly aggregation, the window trim, signal logic, simulation and the threshold sweep |
+| `engine.js` | RSI, Williams %R, WMA, weekly aggregation, the window trim, signal logic, simulation, the threshold sweep and the descriptive price-level reading |
 | `chart.js` | Log-scale SVG price and equity charts, drawn without a charting library |
 | `data.js` | Multi-source fetching, fallbacks and the day cache |
 | `app.js` | Rendering; every number shown is derived from computed results |
